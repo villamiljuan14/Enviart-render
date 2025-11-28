@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Proveedor - Enviart</title>
+    <meta name="description"
+        content="Panel de control para proveedores de Enviart - Gestiona tus productos, inventario y pedidos">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+
+<body class="min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="glass-card shadow-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20">
+                <div class="flex items-center gap-3">
+                    <div class="bg-gradient-to-br from-purple-600 to-indigo-600 text-white p-3 rounded-xl shadow-lg">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-bold text-slate-800 tracking-tight">Enviart</span>
+                        <span class="block text-xs font-semibold gradient-text">Portal Proveedor</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <!-- Dark Mode Toggle -->
+                    <button id="theme-toggle" type="button" aria-label="Toggle Dark Mode"
+                        class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+                        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z"
+                                fill-rule="evenodd" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                    <!-- Notifications -->
+                    <button class="relative p-2 text-slate-600 hover:text-purple-600 transition-colors"
+                        aria-label="Notificaciones" title="Ver notificaciones">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full pulse-dot"></span>
+                    </button>
+
+                    <div class="hidden md:flex flex-col items-end">
+                        <span class="text-sm font-semibold text-slate-900"
+                            th:text="${email}">proveedor@enviart.com</span>
+                        <span class="text-xs text-purple-600 font-bold bg-purple-50 px-3 py-1 rounded-full">
+                            PROVEEDOR
+                        </span>
+                    </div>
+
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit"
+                            class="text-slate-500 hover:text-red-600 transition-colors duration-200 p-2"
+                            title="Cerrar Sesión">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="relative overflow-hidden">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-5xl font-extrabold text-white mb-4 drop-shadow-lg">
+                    ¡Bienvenido, Proveedor! 🚀
+                </h1>
+                <p class="text-xl text-purple-100 max-w-2xl mx-auto">
+                    Gestiona tu inventario, pedidos y estadísticas de ventas en tiempo real
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Productos Activos -->
+            <div class="glass-card rounded-2xl shadow-xl p-6 stat-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-xl shadow-lg">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                    </div>
+                    <span class="text-4xl font-extrabold text-slate-800">247</span>
+                </div>
+                <h3 class="text-lg font-bold text-slate-700">Productos Activos</h3>
+                <p class="text-sm text-green-600 font-semibold mt-1">↑ 12% este mes</p>
+            </div>
+
+            <!-- Pedidos Pendientes -->
+            <div class="glass-card rounded-2xl shadow-xl p-6 stat-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="bg-gradient-to-br from-orange-500 to-orange-600 p-4 rounded-xl shadow-lg">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                    </div>
+                    <span class="text-4xl font-extrabold text-slate-800">38</span>
+                </div>
+                <h3 class="text-lg font-bold text-slate-700">Pedidos Pendientes</h3>
+                <p class="text-sm text-orange-600 font-semibold mt-1">Requieren atención</p>
+            </div>
+
+            <!-- Ventas del Mes -->
+            <div class="glass-card rounded-2xl shadow-xl p-6 stat-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="bg-gradient-to-br from-green-500 to-green-600 p-4 rounded-xl shadow-lg">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <span class="text-4xl font-extrabold text-slate-800">$45.2K</span>
+                </div>
+                <h3 class="text-lg font-bold text-slate-700">Ventas del Mes</h3>
+                <p class="text-sm text-green-600 font-semibold mt-1">↑ 23% vs mes anterior</p>
+            </div>
+
+            <!-- Stock Bajo -->
+            <div class="glass-card rounded-2xl shadow-xl p-6 stat-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="bg-gradient-to-br from-red-500 to-red-600 p-4 rounded-xl shadow-lg">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <span class="text-4xl font-extrabold text-slate-800">15</span>
+                </div>
+                <h3 class="text-lg font-bold text-slate-700">Productos Stock Bajo</h3>
+                <p class="text-sm text-red-600 font-semibold mt-1">Requieren reposición</p>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Ventas Mensuales -->
+            <div class="glass-card rounded-2xl shadow-xl p-6 lg:col-span-2">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-slate-800">Ventas Mensuales</h3>
+                    <select
+                        class="bg-slate-50 border-none text-sm text-slate-600 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500"
+                        aria-label="Período de ventas" title="Seleccionar período">
+                        <option>Últimos 6 meses</option>
+                        <option>Este año</option>
+                        <option>Año pasado</option>
+                    </select>
+                </div>
+                <div id="salesChart" class="w-full h-80"></div>
+            </div>
+
+            <!-- Top Productos -->
+            <div class="glass-card rounded-2xl shadow-xl p-6">
+                <h3 class="text-xl font-bold text-slate-800 mb-4">Top Productos</h3>
+                <div id="topProductsChart" class="w-full h-80"></div>
+            </div>
+        </div>
+
+        <!-- Pedidos Recientes y Acciones Rápidas -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Pedidos Recientes -->
+            <div class="glass-card rounded-2xl shadow-xl p-6 lg:col-span-2">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-slate-800">Pedidos Recientes</h3>
+                    <button class="text-purple-600 hover:text-purple-700 font-semibold text-sm">Ver todos →</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-slate-200">
+                                <th class="text-left py-3 px-4 text-sm font-bold text-slate-700">ID Pedido</th>
+                                <th class="text-left py-3 px-4 text-sm font-bold text-slate-700">Producto</th>
+                                <th class="text-left py-3 px-4 text-sm font-bold text-slate-700">Cantidad</th>
+                                <th class="text-left py-3 px-4 text-sm font-bold text-slate-700">Estado</th>
+                                <th class="text-left py-3 px-4 text-sm font-bold text-slate-700">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-slate-100 hover:bg-purple-50 transition-colors">
+                                <td class="py-4 px-4 text-sm font-semibold text-slate-800">#ORD-1234</td>
+                                <td class="py-4 px-4 text-sm text-slate-600">Laptop Dell XPS 15</td>
+                                <td class="py-4 px-4 text-sm text-slate-600">2</td>
+                                <td class="py-4 px-4">
+                                    <span
+                                        class="px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">
+                                        Pendiente
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4 text-sm font-bold text-slate-800">$2,999</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-purple-50 transition-colors">
+                                <td class="py-4 px-4 text-sm font-semibold text-slate-800">#ORD-1233</td>
+                                <td class="py-4 px-4 text-sm text-slate-600">iPhone 15 Pro</td>
+                                <td class="py-4 px-4 text-sm text-slate-600">5</td>
+                                <td class="py-4 px-4">
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700">
+                                        En Proceso
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4 text-sm font-bold text-slate-800">$5,995</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-purple-50 transition-colors">
+                                <td class="py-4 px-4 text-sm font-semibold text-slate-800">#ORD-1232</td>
+                                <td class="py-4 px-4 text-sm text-slate-600">Samsung Galaxy S24</td>
+                                <td class="py-4 px-4 text-sm text-slate-600">3</td>
+                                <td class="py-4 px-4">
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                                        Completado
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4 text-sm font-bold text-slate-800">$2,697</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-purple-50 transition-colors">
+                                <td class="py-4 px-4 text-sm font-semibold text-slate-800">#ORD-1231</td>
+                                <td class="py-4 px-4 text-sm text-slate-600">MacBook Air M2</td>
+                                <td class="py-4 px-4 text-sm text-slate-600">1</td>
+                                <td class="py-4 px-4">
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                                        Completado
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4 text-sm font-bold text-slate-800">$1,199</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div class="glass-card rounded-2xl shadow-xl p-6">
+                <h3 class="text-xl font-bold text-slate-800 mb-6">Acciones Rápidas</h3>
+                <div class="space-y-4">
+                    <button
+                        class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Agregar Producto
+                    </button>
+
+                    <button
+                        class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold py-4 px-6 rounded-xl shadow-md border-2 border-slate-200 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        Actualizar Inventario
+                    </button>
+
+                    <button
+                        class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold py-4 px-6 rounded-xl shadow-md border-2 border-slate-200 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Generar Reporte
+                    </button>
+
+                    <button
+                        class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold py-4 px-6 rounded-xl shadow-md border-2 border-slate-200 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Configuración
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertas de Inventario -->
+        <div class="glass-card rounded-2xl shadow-xl p-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="bg-red-100 p-3 rounded-xl">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-slate-800">Alertas de Inventario</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                    <p class="text-sm font-bold text-red-800">Auriculares Sony WH-1000XM5</p>
+                    <p class="text-xs text-red-600 mt-1">Stock: 3 unidades - ¡Crítico!</p>
+                </div>
+                <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-lg">
+                    <p class="text-sm font-bold text-orange-800">Tablet iPad Pro 12.9"</p>
+                    <p class="text-xs text-orange-600 mt-1">Stock: 8 unidades - Bajo</p>
+                </div>
+                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg">
+                    <p class="text-sm font-bold text-yellow-800">Smartwatch Apple Watch S9</p>
+                    <p class="text-xs text-yellow-600 mt-1">Stock: 12 unidades - Moderado</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Charts Initialization -->
+    <script th:src="@{/js/dashboard.js}"></script>
+
+</body>
+
+</html>

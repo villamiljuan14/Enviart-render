@@ -1,0 +1,6 @@
+# robots.txt para Enviart
+User-agent: *
+Allow: /
+
+# Sitemap (opcional, pero recomendado)
+Sitemap: https://enviart.com/sitemap.xml

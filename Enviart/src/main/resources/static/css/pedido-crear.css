@@ -1,0 +1,38 @@
+body {
+    font-family: 'Outfit', sans-serif;
+}
+
+.step-indicator {
+    transition: all 0.3s ease;
+}
+
+.step-active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.step-completed {
+    background: #10b981;
+    color: white;
+}
+
+.step-inactive {
+    background: #e5e7eb;
+    color: #6b7280;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

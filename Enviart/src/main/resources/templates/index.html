@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Enviart: mensajería de mercancías rápida, segura y con cobertura nacional en Colombia. Rastrea tus envíos en tiempo real.">
+  <title>Mensajería de Mercancías – Enviart</title>
+  <link rel="preload" as="image" href="/images/bogota-1200.avif">
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+
+  <!-- 🔹 Navbar -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <a th:href="@{/}" class="logo">
+        <img th:src="@{/images/Logo.avif}" alt="Logo Enviart" class="logo-img">
+        <span class="logo-text">Enviart</span>
+      </a>
+
+      <nav class="nav-links">
+        <a th:href="@{/}" class="nav-link">Inicio</a>
+        <a th:href="@{/servicios}" class="nav-link">Servicios</a>
+        <a th:href="@{/rastrear}" class="nav-link">Rastrear Envío</a>
+        <a th:href="@{/contacto}" class="nav-link">Contacto</a>
+      </nav>
+
+      <div class="nav-buttons">
+        <a th:href="@{/login}" class="btn btn-outline">Ingresar</a>
+        <a th:href="@{/register}" class="btn btn-primary">Registrarse</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 🔹 Carrusel -->
+  <section class="carousel-section">
+    <div id="carousel" class="carousel-slides">
+      <!-- Slide 1 (LCP) -->
+      <div class="carousel-slide">
+        <img 
+          src="/images/bogota.avif" 
+          alt="Envíos Express"
+          class="slide-image"
+          fetchpriority="high"
+          loading="eager"
+        >
+        <div class="slide-content">
+          <h2 class="slide-title">Envíos Express</h2>
+          <p class="slide-text">Entrega rápida y segura en todo el país.</p>
+        </div>
+      </div>
+
+      <!-- Slide 2 -->
+      <div class="carousel-slide">
+        <img 
+          src="/images/Medellin.avif" 
+          alt="Seguimiento en Tiempo Real"
+          class="slide-image"
+          loading="lazy"
+        >
+        <div class="slide-content">
+          <h2 class="slide-title">Seguimiento en Tiempo Real</h2>
+          <p class="slide-text">Monitorea cada paso de tu envío desde nuestro panel.</p>
+        </div>
+      </div>
+
+      <!-- Slide 3 -->
+      <div class="carousel-slide">
+        <img 
+          src="/images/cali.avif" 
+          alt="Cobertura Nacional"
+          class="slide-image"
+          loading="lazy"
+        >
+        <div class="slide-content">
+          <h2 class="slide-title">Cobertura Nacional</h2>
+          <p class="slide-text">Llegamos a todas las ciudades, sin importar el tamaño.</p>
+        </div>
+      </div>
+
+      <!-- Slide 4 -->
+      <div class="carousel-slide">
+        <img 
+          src="/images/villa.avif" 
+          alt="Seguridad y Confianza"
+          class="slide-image"
+          loading="lazy"
+        >
+        <div class="slide-content">
+          <h2 class="slide-title">Seguridad y Confianza</h2>
+          <p class="slide-text">Tu carga protegida de principio a fin.</p>
+        </div>
+      </div>
+    </div>
+    <button id="prev" class="carousel-btn prev-btn"><</button>
+    <button id="next" class="carousel-btn next-btn">></button>
+  </section>
+
+  <!-- 🔹 Sección de Cards -->
+  <section class="cards-section">
+    <div class="container">
+      <h2 class="section-title">Destacados</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <img th:src="@{/images/bogotamin.avif}" alt="Servicio Express" class="card-img">
+          <div class="card-body">
+            <h3 class="card-title">Envíos Express</h3>
+            <p class="card-text">Entrega rápida y segura en toda Colombia.</p>
+            <button class="btn btn-primary card-btn">Ver más</button>
+          </div>
+        </div>
+        <div class="card">
+          <img th:src="@{/images/Medellinmin.avif}" alt="Rastreo" class="card-img">
+          <div class="card-body">
+            <h3 class="card-title">Rastreo en Tiempo Real</h3>
+            <p class="card-text">Monitorea tu envío desde nuestra plataforma.</p>
+            <button class="btn btn-primary card-btn">Rastrear</button>
+          </div>
+        </div>
+        <div class="card">
+          <img th:src="@{/images/calimin.avif}" alt="Cobertura" class="card-img">
+          <div class="card-body">
+            <h3 class="card-title">Cobertura Nacional</h3>
+            <p class="card-text">Llegamos a cada rincón del país sin límites.</p>
+            <button class="btn btn-primary card-btn">Conoce más</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🔹 Rastreo -->
+  <section class="search-section">
+    <div class="container">
+      <h2 class="section-title">Rastrea tu envío</h2>
+      <p class="section-text">Ingresa el número de guía para conocer el estado de tu envío.</p>
+      <form th:action="@{/rastrear}" method="get" class="search-form">
+        <input type="text" name="guia" placeholder="Número de guía" class="search-input" required>
+        <button type="submit" class="btn btn-primary search-btn">Rastrear</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- 🔹 Footer -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-col">
+        <h3 class="footer-title">Enviart</h3>
+        <p class="footer-text">Tu aliado en envíos rápidos y seguros.</p>
+      </div>
+      <div class="footer-col">
+        <h3 class="footer-title">Enlaces</h3>
+        <ul class="footer-links">
+          <li><a th:href="@{/servicios}" class="footer-link">Servicios</a></li>
+          <li><a th:href="@{/rastrear}" class="footer-link">Rastrear</a></li>
+          <li><a th:href="@{/contacto}" class="footer-link">Contacto</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3 class="footer-title">Contacto</h3>
+        <p class="footer-text">📍 Bogotá, Colombia</p>
+        <p class="footer-text">☎ 300 123 4567</p>
+        <p class="footer-text">✉ contacto@enviart.com</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}"></span> Enviart. Todos los derechos reservados.
+    </div>
+  </footer>
+
+  <!-- Script estático -->
+  <script th:src="@{/js/script.js}"></script>
+</body>
+</html>

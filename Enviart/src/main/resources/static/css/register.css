@@ -1,0 +1,15 @@
+body {
+    font-family: 'Outfit', sans-serif;
+}
+
+.requirement-item {
+    transition: all 0.3s ease;
+}
+
+.requirement-item.valid {
+    color: #10b981;
+}
+
+.requirement-item.invalid {
+    color: #94a3b8;
+}

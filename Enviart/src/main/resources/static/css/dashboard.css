@@ -1,0 +1,210 @@
+/* dashboard.css */
+
+/* Base Styles */
+body {
+    font-family: 'Outfit', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark Mode Transitions */
+.dark body {
+    background-color: #0f172a;
+    /* Slate 900 */
+    color: #f1f5f9;
+    /* Slate 100 */
+}
+
+/* Glassmorphism - Unified */
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.dark .glass-card {
+    background: rgba(30, 41, 59, 0.8);
+    /* Slate 800 with opacity */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ApexCharts Tooltip Customization for Dark Mode */
+.apexcharts-tooltip {
+    background: #fff;
+    border-color: #e2e8f0;
+    color: #1e293b;
+}
+
+.dark .apexcharts-tooltip {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #fff;
+}
+
+.dark .apexcharts-tooltip-title {
+    background: #0f172a !important;
+    border-bottom: 1px solid #334155 !important;
+    color: #fff;
+}
+
+.dark .apexcharts-text {
+    fill: #cbd5e1 !important;
+    /* Slate 300 */
+}
+
+.dark .apexcharts-gridline {
+    stroke: #334155 !important;
+    /* Slate 700 */
+}
+
+.dark .apexcharts-legend-text {
+    color: #cbd5e1 !important;
+}
+
+/* Animations */
+@keyframes pulse-ring {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(14, 165, 233, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(14, 165, 233, 0);
+    }
+}
+
+.pulse-ring {
+    animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes floating {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.floating {
+    animation: floating 3s ease-in-out infinite;
+}
+
+/* Card Hover Effects */
+.stat-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.dark .stat-card:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Gradient Text */
+.gradient-text {
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-text-blue {
+    background-image: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+}
+
+.gradient-text-purple {
+    background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Route Animation (Mensajero) */
+.route-line {
+    height: 2px;
+    background: linear-gradient(to right, #0ea5e9, #14b8a6);
+    position: relative;
+}
+
+.route-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    position: absolute;
+    top: -5px;
+    animation: move-dot 3s linear infinite;
+}
+
+@keyframes move-dot {
+    0% {
+        left: 0%;
+    }
+
+    100% {
+        left: 100%;
+    }
+}
+
+/* Navbar Dark Mode */
+.dark nav {
+    background-color: rgba(15, 23, 42, 0.9);
+    /* Slate 900 */
+    border-bottom-color: #334155;
+}
+
+.dark .text-slate-800 {
+    color: #f1f5f9;
+}
+
+.dark .text-slate-700 {
+    color: #e2e8f0;
+}
+
+.dark .text-slate-600 {
+    color: #cbd5e1;
+}
+
+.dark .text-slate-500 {
+    color: #94a3b8;
+}
+
+.dark .bg-white {
+    background-color: #1e293b;
+}
+
+/* Slate 800 */
+.dark .bg-slate-50 {
+    background-color: #0f172a;
+}
+
+/* Slate 900 */
+.dark .border-slate-100 {
+    border-color: #334155;
+}
+
+.dark .border-slate-200 {
+    border-color: #334155;
+}
+
+/* Specific overrides for elements that hardcode bg-white but need to be dark */
+.dark .bg-white {
+    background-color: #1e293b;
+}
+
+.dark .hover\:bg-slate-50:hover {
+    background-color: #334155;
+}
+
+.dark .hover\:bg-slate-100:hover {
+    background-color: #334155;
+}

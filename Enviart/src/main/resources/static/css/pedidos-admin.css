@@ -1,0 +1,10 @@
+#pedidosTable {
+    width: 100% !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background-color: #f97316;
+    /* orange-500 */
+    border-color: #f97316;
+    color: white !important;
+}
