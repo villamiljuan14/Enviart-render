@@ -1,0 +1,35 @@
+:root {
+    --primary: #4f46e5;
+    /* Adjusted primary color for theme consistency */
+    --dark-bg: #1f2937;
+    --sidebar-bg: #111827;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.dark {
+    --dark-bg: #111827;
+}
+
+.text-primary {
+    color: var(--primary);
+}
+
+.bg-primary {
+    background-color: var(--primary);
+}
+
+.hover\:text-primary-600:hover {
+    color: #4338ca;
+}
+
+/* Map Container */
+#coverage-map {
+    height: 300px;
+    width: 100%;
+    border-radius: 0.5rem;
+    z-index: 1;
+}

@@ -1,0 +1,50 @@
+/* Estilos básicos para la interfaz de ejemplo */
+.primary {
+    color: #3b82f6;
+}
+
+.bg-primary\/10 {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+.hover\:bg-primary\/20:hover {
+    background-color: rgba(59, 130, 246, 0.2);
+}
+
+.text-primary {
+    color: #3b82f6;
+}
+
+/* Asegurando que el cuerpo ocupe toda la pantalla y el sidebar funcione bien */
+.h-screen-full {
+    height: 100vh;
+}
+
+/* Estilos para modo oscuro (simulados) */
+.dark .bg-gray-900 {
+    background-color: #111827;
+}
+
+.dark .bg-[#24303F] {
+    background-color: #24303F;
+}
+
+.dark .text-slate-200 {
+    color: #e2e8f0;
+}
+
+.dark .text-white {
+    color: #ffffff;
+}
+
+.dark .border-gray-700 {
+    border-color: #374151;
+}
+
+/* Map Container */
+#mapaRutaMensajero {
+    height: 320px;
+    width: 100%;
+    border-radius: 0.5rem;
+    z-index: 1;
+}

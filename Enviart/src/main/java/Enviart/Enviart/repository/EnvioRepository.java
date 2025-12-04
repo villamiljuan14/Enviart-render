@@ -47,4 +47,12 @@ public interface EnvioRepository extends JpaRepository<Envio, Integer> {
     // Hourly Activity (Created At)
     @Query("SELECT HOUR(e.createdAt), COUNT(e) FROM Envio e GROUP BY HOUR(e.createdAt)")
     List<Object[]> findHourlyActivity();
+
+    // Count Created by Month (Current Year)
+    @Query("SELECT MONTH(e.createdAt), COUNT(e) FROM Envio e WHERE YEAR(e.createdAt) = YEAR(CURRENT_DATE) GROUP BY MONTH(e.createdAt)")
+    List<Object[]> countCreatedByMonth();
+
+    // Count Delivered by Month (Current Year)
+    @Query("SELECT MONTH(e.fechaEntregaReal), COUNT(e) FROM Envio e WHERE e.estado = 'ENTREGADO' AND YEAR(e.fechaEntregaReal) = YEAR(CURRENT_DATE) GROUP BY MONTH(e.fechaEntregaReal)")
+    List<Object[]> countDeliveredByMonth();
 }

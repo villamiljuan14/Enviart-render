@@ -1,0 +1,17 @@
+{
+  "name": "enviart",
+  "version": "1.0.0",
+  "description": "Project description.",
+  "sideEffects": false,
+  "dependencies": {
+    "apexcharts": "^5.3.6",
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "vite": "^5.4.21"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  }
+}

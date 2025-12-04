@@ -1,48 +1,54 @@
-// Dark Mode Logic
+import ApexCharts from 'apexcharts';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
 const themeToggleBtn = document.getElementById('theme-toggle');
 const darkIcon = document.getElementById('theme-toggle-dark-icon');
 const lightIcon = document.getElementById('theme-toggle-light-icon');
 
-// Check local storage or system preference
 if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
     document.documentElement.classList.add('dark');
-    lightIcon.classList.remove('hidden');
+    if (lightIcon) lightIcon.classList.remove('hidden');
+    if (darkIcon) darkIcon.classList.add('hidden');
 } else {
     document.documentElement.classList.remove('dark');
-    darkIcon.classList.remove('hidden');
+    if (darkIcon) darkIcon.classList.remove('hidden');
+    if (lightIcon) lightIcon.classList.add('hidden');
 }
 
-themeToggleBtn.addEventListener('click', function () {
-    darkIcon.classList.toggle('hidden');
-    lightIcon.classList.toggle('hidden');
+if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', function () {
+        if (darkIcon) darkIcon.classList.toggle('hidden');
+        if (lightIcon) lightIcon.classList.toggle('hidden');
 
-    if (localStorage.getItem('color-theme')) {
-        if (localStorage.getItem('color-theme') === 'light') {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('color-theme', 'dark');
+        if (localStorage.getItem('color-theme')) {
+            if (localStorage.getItem('color-theme') === 'light') {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+            }
         } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('color-theme', 'light');
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+            }
         }
-    } else {
-        if (document.documentElement.classList.contains('dark')) {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('color-theme', 'light');
-        } else {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('color-theme', 'dark');
-        }
-    }
-});
+        updateChartTheme();
+    });
+}
 
-// ApexCharts Configuration
 const options = {
     series: [{
         name: 'Envíos',
-        data: [44, 55, 57, 56, 61, 58, 63, 60, 66]
+        data: (typeof chartDataEnvios !== 'undefined') ? chartDataEnvios : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     }, {
         name: 'Entregas',
-        data: [76, 85, 101, 98, 87, 105, 91, 114, 94]
+        data: (typeof chartDataEntregas !== 'undefined') ? chartDataEntregas : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     }],
     chart: {
         type: 'bar',
@@ -67,25 +73,15 @@ const options = {
         colors: ['transparent']
     },
     xaxis: {
-        categories: ['Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct'],
+        categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
         axisBorder: { show: false },
         axisTicks: { show: false },
-        labels: {
-            style: { colors: '#64748B' }
-        }
+        labels: { style: { colors: '#64748B' } }
     },
-    yaxis: {
-        labels: {
-            style: { colors: '#64748B' }
-        }
-    },
+    yaxis: { labels: { style: { colors: '#64748B' } } },
     fill: { opacity: 1 },
     tooltip: {
-        y: {
-            formatter: function (val) {
-                return val + " envíos"
-            }
-        },
+        y: { formatter: function (val) { return val + " envíos" } },
         theme: 'dark'
     },
     grid: {
@@ -100,35 +96,50 @@ const options = {
     }
 };
 
-// Adjust chart for dark mode dynamically
+let chart;
+
 const updateChartTheme = () => {
-    if (document.documentElement.classList.contains('dark')) {
-        options.grid.borderColor = '#374151';
-        options.xaxis.labels.style.colors = '#9CA3AF';
-        options.yaxis.labels.style.colors = '#9CA3AF';
-        options.legend.labels.colors = '#9CA3AF';
-    } else {
-        options.grid.borderColor = '#e2e8f0';
-        options.xaxis.labels.style.colors = '#64748B';
-        options.yaxis.labels.style.colors = '#64748B';
-        options.legend.labels.colors = '#64748B';
-    }
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const darkColors = { grid: '#374151', labels: '#9CA3AF' };
+    const lightColors = { grid: '#e2e8f0', labels: '#64748B' };
+    const themeColors = isDarkMode ? darkColors : lightColors;
+
+    options.grid.borderColor = themeColors.grid;
+    options.xaxis.labels.style.colors = themeColors.labels;
+    options.yaxis.labels.style.colors = themeColors.labels;
+    options.legend.labels.colors = themeColors.labels;
+
     if (chart) {
         chart.updateOptions(options);
     }
 };
 
-let chart;
-const chartElement = document.querySelector("#deliveryChart");
+const chartElement = document.querySelector("#estadisticas-chart");
+
 if (chartElement) {
+    updateChartTheme();
     chart = new ApexCharts(chartElement, options);
     chart.render();
 }
 
-// Listen for theme toggle to update chart
-themeToggleBtn.addEventListener('click', () => {
-    setTimeout(updateChartTheme, 50);
-});
+const latBogota = 4.7110;
+const lngBogota = -74.0721;
+const zoomLevel = 12;
 
-// Initial check
-updateChartTheme();
+const mapContainer = document.getElementById('mapaBogota');
+if (mapContainer) {
+    const mapa = L.map('mapaBogota').setView([latBogota, lngBogota], zoomLevel);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(mapa);
+
+    L.marker([latBogota, lngBogota]).addTo(mapa)
+        .bindPopup('Centro de Operaciones')
+        .openPopup();
+
+    setTimeout(() => {
+        mapa.invalidateSize();
+    }, 100);
+}

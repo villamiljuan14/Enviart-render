@@ -13,6 +13,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.List;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Controller
 @RequestMapping("/pedidos")
@@ -32,6 +34,15 @@ public class PedidoController {
 
         String email = principal.getName();
         List<Pedido> pedidos = pedidoService.obtenerPedidosPorUsuario(email);
+
+        // DEBUG: Verify correct user filtering
+        System.out.println("DEBUG [listarPedidos]: Usuario autenticado: " + email);
+        System.out.println("DEBUG [listarPedidos]: Total pedidos encontrados: " + pedidos.size());
+        for (Pedido p : pedidos) {
+            System.out.println("DEBUG [listarPedidos]: Pedido #" + p.getIdPedido() +
+                    " pertenece a usuario: " + p.getUsuario().getEmail() +
+                    " (ID: " + p.getUsuario().getIdUsuario() + ")");
+        }
 
         model.addAttribute("pedidos", pedidos);
         model.addAttribute("email", email);
@@ -147,8 +158,12 @@ public class PedidoController {
         Pedido pedido = pedidoService.obtenerPedidoPorId(id)
                 .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
 
-        // Verificar que el pedido pertenece al usuario autenticado
-        if (!pedido.getUsuario().getEmail().equals(email)) {
+        // Verificar que el pedido pertenece al usuario autenticado O que es
+        // administrador
+        boolean isAdmin = ((Authentication) principal).getAuthorities()
+                .contains(new SimpleGrantedAuthority("ROLE_ADMINISTRADOR"));
+
+        if (!pedido.getUsuario().getEmail().equals(email) && !isAdmin) {
             return "redirect:/pedidos";
         }
 
@@ -199,16 +214,42 @@ public class PedidoController {
      * Listar todos los pedidos (solo para administradores)
      */
     @GetMapping("/admin/todos")
-    public String listarTodosPedidos(Model model, Principal principal) {
+    public String listarTodosPedidos(
+            @RequestParam(required = false) String desdeStr,
+            @RequestParam(required = false) String hastaStr,
+            @RequestParam(required = false) String estado,
+            @RequestParam(required = false) String usuarioEmail,
+            Model model, Principal principal) {
         if (principal == null) {
             return "redirect:/login";
         }
 
         String email = principal.getName();
-        List<Pedido> pedidos = pedidoService.obtenerTodosPedidos();
+
+        // Parsear fechas
+        java.time.LocalDate desde = null;
+        if (desdeStr != null && !desdeStr.isEmpty()) {
+            desde = java.time.LocalDate.parse(desdeStr);
+        }
+        java.time.LocalDate hasta = null;
+        if (hastaStr != null && !hastaStr.isEmpty()) {
+            hasta = java.time.LocalDate.parse(hastaStr);
+        }
+
+        // Tratar cadenas vacías como null
+        String processedEstado = (estado != null && estado.isEmpty()) ? null : estado;
+        String processedEmail = (usuarioEmail != null && usuarioEmail.isEmpty()) ? null : usuarioEmail;
+
+        List<Pedido> pedidos = pedidoService.filtrarPedidos(desde, hasta, processedEstado, processedEmail);
 
         model.addAttribute("pedidos", pedidos);
         model.addAttribute("email", email);
+
+        // Mantener filtros en la vista
+        model.addAttribute("desde", desde);
+        model.addAttribute("hasta", hasta);
+        model.addAttribute("estado", processedEstado);
+        model.addAttribute("usuarioEmail", processedEmail);
 
         return "pedidos-admin";
     }

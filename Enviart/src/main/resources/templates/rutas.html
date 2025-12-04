@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" th:href="@{images/favicon.jpg}" type="image/svg+xml">
+    <title>Gestión de Rutas</title>
+
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- DataTables con soporte Tailwind -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.tailwindcss.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/2.1.3/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/2.1.3/js/dataTables.tailwindcss.min.js"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="max-w-7xl mx-auto mt-10 bg-white p-6 rounded-2xl shadow-xl">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b pb-4 gap-4">
+            <h2 class="text-3xl font-extrabold text-gray-800">Gestión de Rutas</h2>
+            <div class="flex gap-2">
+                <a th:href="@{/reporte-rutas(fechaStr=${fecha}, estado=${estado}, conductorEmail=${conductorEmail})}"
+                    class="bg-red-600 text-white px-5 py-2 rounded-lg font-semibold shadow-md hover:bg-red-700 transition flex items-center gap-2">
+                    <span>📄</span> PDF
+                </a>
+                <a sec:authorize="hasRole('ADMINISTRADOR')" th:href="@{/rutas/nuevo}"
+                    class="bg-indigo-600 text-white px-5 py-2 rounded-lg font-semibold shadow-md hover:bg-indigo-700 transition">
+                    <span class="text-lg">+</span> Nueva Ruta
+                </a>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200">
+            <form method="get" action="/rutas" class="flex flex-wrap gap-4 items-end">
+                <div class="flex flex-col">
+                    <label class="text-xs font-semibold text-gray-600 mb-1">Fecha Inicio</label>
+                    <input type="date" name="fechaStr" th:value="${fecha}"
+                        class="px-3 py-2 border rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs font-semibold text-gray-600 mb-1">Estado</label>
+                    <select name="estado"
+                        class="px-3 py-2 border rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                        <option value="">Todos</option>
+                        <option value="PLANIFICADA" th:selected="${estado == 'PLANIFICADA'}">Planificada</option>
+                        <option value="EN_CURSO" th:selected="${estado == 'EN_CURSO'}">En Curso</option>
+                        <option value="COMPLETADA" th:selected="${estado == 'COMPLETADA'}">Completada</option>
+                        <option value="CANCELADA" th:selected="${estado == 'CANCELADA'}">Cancelada</option>
+                    </select>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs font-semibold text-gray-600 mb-1">Email Conductor</label>
+                    <input type="text" name="conductorEmail" th:value="${conductorEmail}"
+                        placeholder="Buscar por email..."
+                        class="px-3 py-2 border rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <button type="submit"
+                    class="bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition text-sm font-medium h-10">
+                    🔍 Filtrar
+                </button>
+                <a href="/rutas"
+                    class="text-gray-500 hover:text-gray-700 text-sm underline self-center ml-2">Limpiar</a>
+            </form>
+        </div>
+
+        <!-- Mensajes -->
+        <div th:if="${mensaje}" class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+            <span th:text="${mensaje}"></span>
+        </div>
+        <div th:if="${error}" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Tabla con DataTables -->
+        <div class="overflow-x-auto">
+            <table id="rutasTable" class="min-w-full divide-y divide-gray-200 text-sm text-left">
+                <thead class="bg-gray-700 text-gray-100 uppercase text-xs tracking-wider">
+                    <tr>
+                        <th class="px-4 py-3 rounded-tl-lg">ID</th>
+                        <th class="px-4 py-3">Nombre Ruta</th>
+                        <th class="px-4 py-3">Vehículo</th>
+                        <th class="px-4 py-3">Conductor</th>
+                        <th class="px-4 py-3">Status</th>
+                        <th class="px-4 py-3">Fecha Inicio</th>
+                        <th class="px-4 py-3 rounded-tr-lg text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <tr th:each="r : ${rutas}" class="hover:bg-indigo-50/50 transition duration-150">
+                        <td class="px-4 py-3 font-mono text-xs" th:text="${r.idRuta}">1</td>
+                        <td class="px-4 py-3 font-bold text-gray-900" th:text="${r.nombreRuta}">Ruta Norte</td>
+                        <td class="px-4 py-3" th:text="${r.vehiculo?.placa ?: 'N/A'}">ABC-123</td>
+                        <td class="px-4 py-3"
+                            th:text="${r.conductor?.primerNombre + ' ' + r.conductor?.primerApellido}">
+                            Juan Pérez
+                        </td>
+                        <td class="px-4 py-3">
+                            <span th:text="${r.statusRuta}" th:classappend="${r.statusRuta == 'COMPLETADA' ? 'bg-green-100 text-green-800' : 
+                                                 r.statusRuta == 'EN_CURSO' ? 'bg-blue-100 text-blue-800' : 
+                                                 r.statusRuta == 'CANCELADA' ? 'bg-red-100 text-red-800' : 
+                                                 'bg-yellow-100 text-yellow-800'}"
+                                class="px-2 py-1 rounded-full text-xs font-semibold">
+                                PLANIFICADA
+                            </span>
+                        </td>
+                        <td class="px-4 py-3" th:text="${r.fechaInicio ?: 'N/A'}">2024-01-15</td>
+                        <td class="px-4 py-3 text-center space-x-2 whitespace-nowrap">
+                            <a sec:authorize="hasRole('ADMINISTRADOR')" th:href="@{'/rutas/editar/' + ${r.idRuta}}"
+                                class="bg-yellow-500 text-white px-3 py-1 rounded-md text-xs hover:bg-yellow-600 transition">
+                                Editar
+                            </a>
+
+                            <a sec:authorize="hasRole('ADMINISTRADOR')" th:href="@{'/rutas/eliminar/' + ${r.idRuta}}"
+                                class="bg-red-600 text-white px-3 py-1 rounded-md text-xs hover:bg-red-700 transition"
+                                onclick="return confirm('¿Estás seguro de eliminar esta ruta?');">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Enlace para volver a Home -->
+        <div class="flex justify-between mt-8 pt-4 border-t border-gray-200">
+            <a th:href="@{/home}" class="text-indigo-600 hover:text-indigo-800 transition font-medium">
+                ← Volver al inicio
+            </a>
+        </div>
+    </div>
+
+    <script th:src="@{/js/rutas.js}"></script>
+
+</body>
+
+</html>

@@ -33,10 +33,20 @@ public class SecurityConfig {
                         // Rutas públicas
                         .requestMatchers("/", "/index", "/login", "/register", "/api/usuarios/registro", "/api/auth/**",
                                 "/css/**", "/js/**", "/images/**", "/videos/**", "/robots.txt", "/error",
-                                "/favicon.ico")
+                                "/favicon.ico",
+                                "/ws-tracking/**", // WebSocket endpoint
+                                "/api/tracking/**", // REST API tracking
+                                "/tracking-demo") // Página demo tracking
                         .permitAll()
                         // Rutas restringidas por rol
                         .requestMatchers("/usuarios", "/usuarios/**").hasRole("ADMINISTRADOR")
+                        .requestMatchers("/rutas", "/rutas/**").hasAnyRole("ADMINISTRADOR", "MENSAJERO")
+                        .requestMatchers("/vehiculos", "/vehiculos/**").hasRole("ADMINISTRADOR")
+                        .requestMatchers("/tipos-servicio", "/tipos-servicio/**").hasRole("ADMINISTRADOR")
+                        .requestMatchers("/tarifas").hasAnyRole("ADMINISTRADOR", "PROVEEDOR")
+                        .requestMatchers("/tipos-pago", "/tipos-pago/**").hasRole("ADMINISTRADOR")
+                        .requestMatchers("/pagos", "/pagos/**").hasAnyRole("ADMINISTRADOR", "PROVEEDOR")
+                        .requestMatchers("/novedades", "/novedades/**").hasAnyRole("ADMINISTRADOR", "MENSAJERO")
                         .requestMatchers("/reporte-usuarios", "/vista-usuarios").permitAll()
                         // Rutas de pedidos - las más específicas primero
                         .requestMatchers("/pedidos/admin/**").hasRole("ADMINISTRADOR")

@@ -22,9 +22,22 @@ public class VehiculoController {
     }
 
     @GetMapping
-    public String listarVehiculos(Model model) {
-        List<Vehiculo> vehiculos = vehiculoService.listarVehiculos();
+    public String listarVehiculos(
+            @RequestParam(required = false) String placa,
+            @RequestParam(required = false) String modelo,
+            Model model) {
+
+        // Tratar cadenas vacías como null
+        String processedPlaca = (placa != null && placa.isEmpty()) ? null : placa;
+        String processedModelo = (modelo != null && modelo.isEmpty()) ? null : modelo;
+
+        List<Vehiculo> vehiculos = vehiculoService.filtrarVehiculos(processedPlaca, processedModelo);
         model.addAttribute("vehiculos", vehiculos);
+
+        // Mantener filtros en la vista
+        model.addAttribute("placa", processedPlaca);
+        model.addAttribute("modelo", processedModelo);
+
         return "vehiculos";
     }
 

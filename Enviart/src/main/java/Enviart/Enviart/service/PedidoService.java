@@ -52,12 +52,11 @@ public class PedidoService {
         // Procesar dirección de destino
         Direccion direccionDestino = procesarDireccion(pedidoDTO.getDireccionDestino(), usuario);
 
-        // Obtener estado inicial del pedido (PENDIENTE)
-        EstadoPedido estadoPendiente = estadoPedidoRepository.findByNombre("PENDIENTE")
+        // Obtener estado inicial del pedido (RECEPCIONADO)
+        EstadoPedido estadoPendiente = estadoPedidoRepository.findByNombre("RECEPCIONADO")
                 .orElseGet(() -> {
                     EstadoPedido nuevoEstado = new EstadoPedido();
-                    nuevoEstado.setNombre("PENDIENTE");
-                    nuevoEstado.setOrden(1);
+                    nuevoEstado.setNombre("RECEPCIONADO");
                     return estadoPedidoRepository.save(nuevoEstado);
                 });
 
@@ -178,7 +177,11 @@ public class PedidoService {
     public List<Pedido> obtenerPedidosPorUsuario(String emailUsuario) {
         Usuario usuario = usuarioService.buscarPorEmail(emailUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        return pedidoRepository.findByUsuarioOrderByFechaPedidoDesc(usuario);
+        System.out.println("DEBUG [obtenerPedidosPorUsuario]: Buscando pedidos para usuario ID=" +
+                usuario.getIdUsuario() + ", email=" + usuario.getEmail());
+        List<Pedido> pedidos = pedidoRepository.findByUsuarioOrderByFechaPedidoDesc(usuario);
+        System.out.println("DEBUG [obtenerPedidosPorUsuario]: Encontrados " + pedidos.size() + " pedidos");
+        return pedidos;
     }
 
     /**
@@ -255,5 +258,78 @@ public class PedidoService {
      */
     public List<EstadoPedido> obtenerEstadosPedido() {
         return estadoPedidoRepository.findAll();
+    }
+
+    /**
+     * Filtrar pedidos por criterios
+     */
+    public List<Pedido> filtrarPedidos(java.time.LocalDate desde, java.time.LocalDate hasta, String estado,
+            String usuarioEmail) {
+        List<Pedido> pedidos = pedidoRepository.findAll();
+
+        return pedidos.stream()
+                .filter(p -> {
+                    boolean matches = true;
+
+                    // Filtro por fecha desde
+                    if (desde != null) {
+                        if (p.getFechaPedido().toLocalDate().isBefore(desde)) {
+                            matches = false;
+                        }
+                    }
+
+                    // Filtro por fecha hasta
+                    if (matches && hasta != null) {
+                        if (p.getFechaPedido().toLocalDate().isAfter(hasta)) {
+                            matches = false;
+                        }
+                    }
+
+                    // Filtro por estado
+                    if (matches && estado != null && !estado.isEmpty()) {
+                        if (p.getEstado() == null || !p.getEstado().getNombre().equals(estado)) {
+                            matches = false;
+                        }
+                    }
+
+                    // Filtro por email de usuario
+                    if (matches && usuarioEmail != null && !usuarioEmail.isEmpty()) {
+                        if (p.getUsuario() == null
+                                || !p.getUsuario().getEmail().toLowerCase().contains(usuarioEmail.toLowerCase())) {
+                            matches = false;
+                        }
+                    }
+
+                    return matches;
+                })
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    /**
+     * Contar todos los pedidos en el sistema
+     */
+    public long contarTodosLosPedidos() {
+        return pedidoRepository.count();
+    }
+
+    /**
+     * Contar pedidos por estado
+     */
+    public long contarPedidosPorEstado(String nombreEstado) {
+        return pedidoRepository.findByEstadoNombre(nombreEstado).size();
+    }
+
+    /**
+     * Obtener pedidos por rango de fecha
+     */
+    public List<Pedido> obtenerPedidosPorRangoFecha(LocalDateTime inicio, LocalDateTime fin) {
+        return pedidoRepository.findByFechaPedidoBetween(inicio, fin);
+    }
+
+    /**
+     * Obtener pedidos asignados a un conductor (a través de rutas)
+     */
+    public List<Pedido> obtenerPedidosPorConductor(Integer conductorId) {
+        return pedidoRepository.findPedidosByConductorId(conductorId);
     }
 }

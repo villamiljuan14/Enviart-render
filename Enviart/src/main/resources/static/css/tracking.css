@@ -1,0 +1,207 @@
+/* Estilos para el sistema de tracking GPS */
+
+/* Contenedor del mapa */
+.tracking-map-container {
+    width: 100%;
+    height: 500px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Ajustes para mapas en modales o cards */
+.tracking-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.tracking-card h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Información del pedido */
+.tracking-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.tracking-info-item {
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    border-left: 3px solid #4f46e5;
+}
+
+.tracking-info-item label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6b7280;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.tracking-info-item .value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* Badge de estado */
+.tracking-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.tracking-status.en-transito {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.tracking-status.entregado {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.tracking-status.recepcionado {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* Indicador de conexión WebSocket */
+.ws-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.ws-status.connected {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.ws-status.disconnected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.ws-status.connecting {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.ws-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.ws-status.connected .ws-status-dot {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Controles del mapa */
+.map-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.map-control-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    color: #374151;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.map-control-btn:hover {
+    background: #f9fafb;
+    border-color: #4f46e5;
+    color: #4f46e5;
+}
+
+.map-control-btn:active {
+    transform: scale(0.98);
+}
+
+.map-control-btn.active {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tracking-map-container {
+        height: 400px;
+    }
+    
+    .tracking-info {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .tracking-card {
+        background: #1f2937;
+    }
+    
+    .tracking-card h3 {
+        color: #f9fafb;
+    }
+    
+    .tracking-info-item {
+        background: #374151;
+        border-left-color: #818cf8;
+    }
+    
+    .tracking-info-item label {
+        color: #9ca3af;
+    }
+    
+    .tracking-info-item .value {
+        color: #f9fafb;
+    }
+    
+    .map-control-btn {
+        background: #374151;
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+    
+    .map-control-btn:hover {
+        background: #4b5563;
+        border-color: #818cf8;
+    }
+}

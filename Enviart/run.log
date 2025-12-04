@@ -1,0 +1,222 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------------< Enviart:Enviart >---------------------------
+[INFO] Building Enviart 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.4.12:run (default-cli) > test-compile @ Enviart >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ Enviart ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 83 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ Enviart ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ Enviart ---
+[INFO] skip non existing resourceDirectory /home/manuel/Escritorio/Enviart/Enviart/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ Enviart ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] <<< spring-boot:3.4.12:run (default-cli) < test-compile @ Enviart <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.4.12:run (default-cli) @ Enviart ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.4.12)
+
+2025-12-02T15:46:44.090-05:00  INFO 101500 --- [Enviart] [           main] Enviart.Enviart.EnviartApplication       : Starting EnviartApplication using Java 21.0.9 with PID 101500 (/home/manuel/Escritorio/Enviart/Enviart/target/classes started by manuel in /home/manuel/Escritorio/Enviart/Enviart)
+2025-12-02T15:46:44.092-05:00  INFO 101500 --- [Enviart] [           main] Enviart.Enviart.EnviartApplication       : No active profile set, falling back to 1 default profile: "default"
+2025-12-02T15:46:44.814-05:00  INFO 101500 --- [Enviart] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-12-02T15:46:44.933-05:00  INFO 101500 --- [Enviart] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 107 ms. Found 14 JPA repository interfaces.
+2025-12-02T15:46:45.496-05:00  INFO 101500 --- [Enviart] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-12-02T15:46:45.511-05:00  INFO 101500 --- [Enviart] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-12-02T15:46:45.511-05:00  INFO 101500 --- [Enviart] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.49]
+2025-12-02T15:46:45.551-05:00  INFO 101500 --- [Enviart] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-12-02T15:46:45.553-05:00  INFO 101500 --- [Enviart] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1412 ms
+2025-12-02T15:46:45.710-05:00  INFO 101500 --- [Enviart] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-12-02T15:46:45.746-05:00  INFO 101500 --- [Enviart] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.36.Final
+2025-12-02T15:46:45.772-05:00  INFO 101500 --- [Enviart] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-12-02T15:46:45.985-05:00  INFO 101500 --- [Enviart] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-12-02T15:46:46.009-05:00  INFO 101500 --- [Enviart] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-12-02T15:46:46.158-05:00  INFO 101500 --- [Enviart] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3a2bb026
+2025-12-02T15:46:46.160-05:00  INFO 101500 --- [Enviart] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-12-02T15:46:46.233-05:00  INFO 101500 --- [Enviart] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0.44
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-12-02T15:46:47.382-05:00  INFO 101500 --- [Enviart] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: 
+    alter table envios 
+       modify column estado enum ('CANCELADO','DEVUELTO','ENTREGADO','EN_DISTRIBUCION','EN_TRANSITO','RECEPCIONADO') not null
+Hibernate: 
+    alter table roles 
+       modify column tipo_rol enum ('ADMINISTRADOR','CLIENTE','MENSAJERO','PROVEEDOR')
+Hibernate: 
+    alter table usuarios 
+       modify column tipo_documento enum ('CC','CE','NIT','PAS','TI') not null
+2025-12-02T15:46:47.625-05:00  INFO 101500 --- [Enviart] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-12-02T15:46:47.940-05:00  INFO 101500 --- [Enviart] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-12-02T15:46:49.104-05:00  WARN 101500 --- [Enviart] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-12-02T15:46:49.140-05:00  INFO 101500 --- [Enviart] [           main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-12-02T15:46:49.140-05:00  WARN 101500 --- [Enviart] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-12-02T15:46:49.218-05:00  INFO 101500 --- [Enviart] [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
+2025-12-02T15:46:49.742-05:00  INFO 101500 --- [Enviart] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-12-02T15:46:49.754-05:00  INFO 101500 --- [Enviart] [           main] Enviart.Enviart.EnviartApplication       : Started EnviartApplication in 6.047 seconds (process running for 6.428)
+Hibernate: 
+    select
+        r1_0.id_rol,
+        r1_0.nombre_rol,
+        r1_0.tipo_rol 
+    from
+        roles r1_0 
+    where
+        r1_0.tipo_rol=?
+Hibernate: 
+    select
+        r1_0.id_rol,
+        r1_0.nombre_rol,
+        r1_0.tipo_rol 
+    from
+        roles r1_0 
+    where
+        r1_0.tipo_rol=?
+Hibernate: 
+    select
+        r1_0.id_rol,
+        r1_0.nombre_rol,
+        r1_0.tipo_rol 
+    from
+        roles r1_0 
+    where
+        r1_0.tipo_rol=?
+Hibernate: 
+    select
+        r1_0.id_rol,
+        r1_0.nombre_rol,
+        r1_0.tipo_rol 
+    from
+        roles r1_0 
+    where
+        r1_0.tipo_rol=?
+Hibernate: 
+    select
+        u1_0.id_usuario,
+        u1_0.contrasena_usuario,
+        u1_0.created_at,
+        u1_0.doc_usuario,
+        u1_0.email,
+        u1_0.estado_usuario,
+        u1_0.primer_apellido,
+        u1_0.primer_nombre,
+        u1_0.rol_id_rol,
+        u1_0.segundo_apellido,
+        u1_0.segundo_nombre,
+        u1_0.telefono,
+        u1_0.tipo_documento,
+        u1_0.two_factor_secret,
+        u1_0.updated_at 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        r1_0.id_rol,
+        r1_0.nombre_rol,
+        r1_0.tipo_rol 
+    from
+        roles r1_0 
+    where
+        r1_0.id_rol=?
+Hibernate: 
+    select
+        count(*) 
+    from
+        tipo_servicio_envio ts1_0
+Hibernate: 
+    select
+        ep1_0.id_estado,
+        ep1_0.nombre,
+        ep1_0.orden 
+    from
+        cat_estado_pedido ep1_0 
+    where
+        ep1_0.nombre=?
+Hibernate: 
+    select
+        ep1_0.id_estado,
+        ep1_0.nombre,
+        ep1_0.orden 
+    from
+        cat_estado_pedido ep1_0 
+    where
+        ep1_0.nombre=?
+Hibernate: 
+    select
+        ep1_0.id_estado,
+        ep1_0.nombre,
+        ep1_0.orden 
+    from
+        cat_estado_pedido ep1_0 
+    where
+        ep1_0.nombre=?
+Hibernate: 
+    select
+        ep1_0.id_estado,
+        ep1_0.nombre,
+        ep1_0.orden 
+    from
+        cat_estado_pedido ep1_0 
+    where
+        ep1_0.nombre=?
+Hibernate: 
+    select
+        ep1_0.id_estado,
+        ep1_0.nombre,
+        ep1_0.orden 
+    from
+        cat_estado_pedido ep1_0 
+    where
+        ep1_0.nombre=?
+Hibernate: 
+    select
+        ep1_0.id_estado,
+        ep1_0.nombre,
+        ep1_0.orden 
+    from
+        cat_estado_pedido ep1_0 
+    where
+        ep1_0.nombre=?
+Hibernate: 
+    select
+        count(*) 
+    from
+        envios e1_0
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  03:58 min
+[INFO] Finished at: 2025-12-02T15:50:40-05:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.4.12:run (default-cli) on project Enviart: Process terminated with exit code: 137 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

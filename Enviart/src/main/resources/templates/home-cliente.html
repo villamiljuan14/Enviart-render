@@ -1,34 +1,68 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" th:href="@{images/favicon.jpg}" type="image/svg+xml">
     <title>Dashboard Cliente - Enviart</title>
+
+    <!-- CSS y Fuentes (manteniendo los enlaces a tus archivos) -->
     <link rel="stylesheet" th:href="@{/css/output.css}">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" th:href="@{/style.css}">
+
+    <!-- 1. Incluir la librería de ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- Tailwind Config - Requerido para Dark Mode y colores de chart -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5', // Color principal para enlaces y énfasis
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <!-- Custom Dashboard CSS -->
+    <link rel="stylesheet" th:href="@{/css/dashboard-cliente.css}">
 </head>
 
 <body class="bg-slate-100 dark:bg-gray-900 text-slate-800 dark:text-slate-200 font-sans transition-colors duration-300">
+
     <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar -->
-        <aside
-            class="w-72 bg-white dark:bg-[#24303F] shadow-lg hidden lg:flex flex-col z-20 transition-colors duration-300">
-            <!-- Logo -->
-            <div class="h-20 flex items-center justify-center border-b border-gray-100 dark:border-gray-700">
+
+        <!-- Sidebar / Menu del Cliente (Usando Thymeleaf) -->
+        <aside class="w-72 bg-[#24303F] shadow-lg hidden lg:flex flex-col z-20 transition-colors duration-300"
+            role="navigation" aria-label="Menu del Cliente">
+            <div class="h-20 flex items-center justify-center border-b border-gray-700">
                 <div class="flex items-center gap-3">
                     <img src="/images/Logo.avif" alt="Enviart Logo" class="h-10 w-auto">
-                    <span class="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Enviart</span>
+                    <span class="text-2xl font-bold text-white tracking-tight">Enviart</span>
                 </div>
             </div>
-            <!-- Menu -->
+
             <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
-                <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Menu Principal</p>
+                <p class="px-4 text-xs font-semibold text-gray-400 dark:text-gray-300 uppercase tracking-wider mb-4">
+                    Servicios</p>
 
                 <a th:href="@{/home}"
-                    class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-lg transition-colors">
+                    class="flex items-center gap-3 px-4 py-3 bg-gray-700 text-white rounded-lg transition-colors"
+                    aria-current="page">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -37,45 +71,69 @@
                 </a>
 
                 <a th:href="@{/pedidos/nuevo}"
-                    class="flex items-center gap-3 px-4 py-3 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors group">
-                    <svg class="w-5 h-5 group-hover:text-primary transition-colors" fill="none" stroke="currentColor"
+                    class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors group">
+                    <svg class="w-5 h-5 group-hover:text-white transition-colors" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span
-                        class="font-medium group-hover:text-slate-800 dark:group-hover:text-white transition-colors">Nuevo
-                        Envío</span>
+                    <span class="font-medium group-hover:text-white transition-colors">Crear Nuevo Envío</span>
                 </a>
 
                 <a th:href="@{/pedidos}"
-                    class="flex items-center gap-3 px-4 py-3 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors group">
-                    <svg class="w-5 h-5 group-hover:text-primary transition-colors" fill="none" stroke="currentColor"
+                    class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors group">
+                    <svg class="w-5 h-5 group-hover:text-white transition-colors" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                     </svg>
-                    <span
-                        class="font-medium group-hover:text-slate-800 dark:group-hover:text-white transition-colors">Mis
-                        Pedidos</span>
+                    <span class="font-medium group-hover:text-white transition-colors">Mis Pedidos</span>
                 </a>
+
+                <p
+                    class="px-4 text-xs font-semibold text-gray-400 dark:text-gray-300 uppercase tracking-wider mt-8 mb-4">
+                    Cuenta</p>
+
+                <a th:href="@{/pedidos}"
+                    class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors group">
+                    <svg class="w-5 h-5 group-hover:text-white transition-colors" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                    <span class="font-medium group-hover:text-white transition-colors">Facturación y Pagos</span>
+                </a>
+
+                <a th:href="@{/home}"
+                    class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors group">
+                    <svg class="w-5 h-5 group-hover:text-white transition-colors" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <span class="font-medium group-hover:text-white transition-colors">Mi Perfil</span>
+                </a>
+
             </nav>
-            <!-- User Profile -->
-            <div class="p-4 border-t border-gray-100 dark:border-gray-700">
-                <div class="flex items-center gap-3">
-                    <div
-                        class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-gray-500 dark:text-gray-300 font-bold">
-                        <span th:text="${#strings.substring(email,0,1).toUpperCase()}">U</span>
+
+            <div class="p-4 border-t border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-gray-300 font-bold"
+                            aria-hidden="true">
+                            <span th:text="${#strings.substring(email,0,1).toUpperCase()}">U</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-white truncate" th:text="${email}">cliente@email.com</p>
+                            <p class="text-xs text-gray-400 dark:text-gray-300 truncate">CLIENTE</p>
+                        </div>
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-slate-800 dark:text-white truncate" th:text="${email}">
-                            usuario@email.com</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">CLIENTE</p>
-                    </div>
-                    <form th:action="@{/logout}" method="post">
+                    <form th:action="@{/logout}" method="post" class="inline">
                         <button type="submit"
-                            class="p-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors shadow-sm"
+                            class="p-2 text-red-400 bg-red-900/20 hover:bg-red-900/40 rounded-lg transition-colors shadow-sm"
                             aria-label="Cerrar sesión" title="Cerrar sesión">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                             </svg>
@@ -85,196 +143,229 @@
             </div>
         </aside>
 
-        <!-- Main Content Wrapper -->
         <div class="flex-1 flex flex-col overflow-hidden relative">
-            <!-- Header -->
+
             <header
-                class="h-20 bg-white dark:bg-[#24303F] shadow-sm flex items-center justify-between px-6 lg:px-8 z-10 transition-colors duration-300">
-                <!-- Search -->
+                class="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 lg:px-8 shadow-sm">
+                <!-- Mobile Menu Button -->
+                <button
+                    class="lg:hidden text-slate-600 dark:text-slate-200 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menú" title="Abrir menú"
+                    onclick="document.querySelector('aside').classList.toggle('hidden')">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+
+                <!-- Search/Title -->
                 <div class="flex items-center gap-4">
-                    <button class="lg:hidden text-gray-500 hover:text-primary" aria-label="Abrir menú">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
-                    <!-- Tracking Bar from Client Dashboard -->
-                    <div class="relative hidden sm:block w-96">
-                        <input type="text" placeholder="Rastrear guía..."
-                            class="pl-10 pr-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary dark:text-white w-full transition-colors">
-                        <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
+                    <h2 class="text-xl font-semibold hidden sm:block text-slate-800 dark:text-white">Dashboard Cliente
+                    </h2>
                 </div>
-                <!-- Right Actions -->
+
+                <!-- Profile/Notifications -->
                 <div class="flex items-center gap-4">
-                    <!-- Dark Mode Toggle -->
-                    <button id="theme-toggle"
-                        class="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
-                        aria-label="Cambiar tema">
-                        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-                        </svg>
-                        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor"
-                            viewBox="0 0 20 20">
-                            <path
-                                d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z"
-                                fill-rule="evenodd" clip-rule="evenodd"></path>
-                        </svg>
-                    </button>
-                    <!-- Notifications -->
                     <button
-                        class="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors relative"
-                        aria-label="Notificaciones">
+                        class="text-slate-600 dark:text-slate-200 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        aria-label="Ver notificaciones" title="Notificaciones">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
-                        <span
-                            class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-gray-800"></span>
                     </button>
+                    <div
+                        class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold lg:hidden">
+                        <span th:text="${#strings.substring(email,0,1).toUpperCase()}">U</span>
+                    </div>
                 </div>
             </header>
 
-            <!-- Main Content -->
-            <main
+            <main role="main"
                 class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-100 dark:bg-gray-900 p-6 lg:p-8 transition-colors duration-300">
-                <!-- Welcome Message -->
-                <div class="mb-8">
-                    <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Hola, <span class="text-primary"
-                            th:text="${nombre != null ? nombre : 'Cliente'}">Cliente</span> 👋</h1>
-                    <p class="text-sm text-slate-500 dark:text-gray-400">Bienvenido a tu panel de control</p>
-                </div>
 
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <!-- Card 1 -->
+                <h1 class="text-3xl font-extrabold text-slate-800 dark:text-white mb-6">📦 Mis Envíos</h1>
+
+                <!-- Tarjetas de Resumen (Stats Cards) -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <!-- Total Envíos Históricos -->
                     <div
-                        class="bg-white dark:bg-[#24303F] rounded-xl shadow-md p-6 border border-slate-300 dark:border-gray-700">
+                        class="rounded-xl border-2 border-slate-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-[#24303F]">
                         <div class="flex items-center justify-between mb-4">
-                            <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-full">
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-full" aria-hidden="true">
                                 <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                                 </svg>
                             </div>
+                            <span
+                                class="text-xs font-bold text-green-500 bg-green-100 dark:bg-green-900/20 px-2 py-1 rounded"
+                                th:text="'+' + ${creadosMes} + '%'">+X%</span>
                         </div>
-                        <h3 class="text-2xl font-bold text-slate-800 dark:text-white mb-1">3</h3>
-                        <p class="text-sm text-slate-500 dark:text-gray-400">Envíos Activos</p>
+                        <h3 class="text-2xl font-bold text-slate-800 dark:text-white mb-1" th:text="${totalEnvios}">0
+                        </h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-300">Total Envíos Históricos</p>
                     </div>
-                    <!-- Card 2 -->
+
+                    <!-- En Tránsito / Activos -->
                     <div
-                        class="bg-white dark:bg-[#24303F] rounded-xl shadow-md p-6 border border-slate-300 dark:border-gray-700">
+                        class="rounded-xl border-2 border-slate-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-[#24303F]">
                         <div class="flex items-center justify-between mb-4">
-                            <div class="bg-green-50 dark:bg-green-900/20 p-3 rounded-full">
-                                <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor"
+                            <div class="bg-cyan-50 dark:bg-cyan-900/20 p-3 rounded-full" aria-hidden="true">
+                                <svg class="w-6 h-6 text-cyan-500" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7" />
+                                        d="M13 10V3L4 14h7v7l9-11h-7z" />
                                 </svg>
                             </div>
+                            <span
+                                class="text-xs font-bold text-yellow-500 bg-yellow-100 dark:bg-yellow-900/20 px-2 py-1 rounded"
+                                th:text="${conNovedad} + ' Novedades'">0</span>
                         </div>
-                        <h3 class="text-2xl font-bold text-slate-800 dark:text-white mb-1">12</h3>
-                        <p class="text-sm text-slate-500 dark:text-gray-400">Entregados</p>
+                        <h3 class="text-2xl font-bold text-slate-800 dark:text-white mb-1" th:text="${enTransito}">0
+                        </h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-300">En Tránsito / Activos</p>
                     </div>
-                    <!-- Card 3 (Action) -->
-                    <a th:href="@{/pedidos/nuevo}"
-                        class="bg-white dark:bg-[#24303F] rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700 group hover:border-primary transition-colors cursor-pointer">
+
+                    <!-- Gasto Total (Este Mes) -->
+                    <div
+                        class="rounded-xl border-2 border-slate-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-[#24303F]">
                         <div class="flex items-center justify-between mb-4">
-                            <div
-                                class="bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-full group-hover:bg-primary group-hover:text-white transition-colors">
-                                <svg class="w-6 h-6 text-primary group-hover:text-white" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-full" aria-hidden="true">
+                                <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                        d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                                 </svg>
                             </div>
+                            <span
+                                class="text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-900/20 px-2 py-1 rounded"
+                                th:text="'Facturas: ' + ${facturasPendientes}">0</span>
                         </div>
-                        <h3
-                            class="text-2xl font-bold text-slate-800 dark:text-white mb-1 group-hover:text-primary transition-colors">
-                            Nuevo Envío</h3>
-                        <p class="text-sm text-slate-500 dark:text-gray-400">Cotiza y envía</p>
-                    </a>
+                        <h3 class="text-2xl font-bold text-slate-800 dark:text-white mb-1"
+                            th:text="'$' + ${#numbers.formatDecimal(gastoTotalMes, 0, 'COMMA', 0, 'POINT')}">$0
+                        </h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-300">Gasto Total (Este Mes)</p>
+                    </div>
+
+                    <!-- Calificar Servicio -->
+                    <div
+                        class="bg-gradient-to-br from-orange-500 to-red-600 rounded-xl shadow-lg p-6 text-white relative overflow-hidden group">
+                        <div class="relative z-10">
+                            <h3 class="text-lg font-bold opacity-90">¡Califica tu Servicio!</h3>
+                            <p class="text-sm opacity-75">Tu opinión es importante</p>
+                            <h2 class="text-4xl font-bold mt-4" th:text="${pendientesCalificar}">0</h2>
+                            <p class="text-xs mt-2 bg-white/20 inline-block px-2 py-1 rounded">Haz clic para calificar
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Recent Shipments Table -->
-                <div
-                    class="bg-white dark:bg-[#24303F] rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                <!-- GRÁFICO DE APEXCHARTS (Nuevo Bloque) -->
+                <div class="grid grid-cols-1 gap-8 mb-8" id="chart-data-container"
+                    th:attr="data-chart=${chartDataJson}">
+
                     <div
-                        class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                        <h3 class="text-lg font-bold text-slate-800 dark:text-white">Mis Envíos Recientes</h3>
-                        <a th:href="@{/pedidos}" class="text-primary hover:text-indigo-600 font-medium text-sm">Ver
-                            todos →</a>
+                        class="lg:col-span-3 rounded-xl border-2 border-slate-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-[#24303F]">
+                        <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-4">Volumen de Envíos por Estado
+                        </h3>
+                        <!-- El gráfico de ApexCharts se renderizará en este div -->
+                        <div id="envios-chart"></div>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead
-                                class="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">
-                                <tr>
-                                    <th class="px-6 py-3 font-semibold">Guía</th>
-                                    <th class="px-6 py-3 font-semibold">Destinatario</th>
-                                    <th class="px-6 py-3 font-semibold">Estado</th>
-                                    <th class="px-6 py-3 font-semibold">Fecha</th>
-                                    <th class="px-6 py-3 font-semibold text-right">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                                <!-- Mock Data Row 1 -->
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
-                                    <td class="px-6 py-4 font-mono text-sm text-slate-600 dark:text-gray-300">
-                                        #ENV-2024-001</td>
-                                    <td class="px-6 py-4 font-medium text-slate-800 dark:text-white">Maria Gonzalez</td>
-                                    <td class="px-6 py-4">
-                                        <span
-                                            class="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 px-2 py-1 rounded-full text-xs font-bold">En
-                                            Tránsito</span>
-                                    </td>
-                                    <td class="px-6 py-4 text-slate-500 dark:text-gray-400 text-sm">26 Nov 2024</td>
-                                    <td class="px-6 py-4 text-right">
-                                        <button class="text-gray-400 hover:text-primary transition">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <!-- Mock Data Row 2 -->
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
-                                    <td class="px-6 py-4 font-mono text-sm text-slate-600 dark:text-gray-300">
-                                        #ENV-2024-002</td>
-                                    <td class="px-6 py-4 font-medium text-slate-800 dark:text-white">Carlos Rodriguez
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span
-                                            class="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 px-2 py-1 rounded-full text-xs font-bold">Entregado</span>
-                                    </td>
-                                    <td class="px-6 py-4 text-slate-500 dark:text-gray-400 text-sm">25 Nov 2024</td>
-                                    <td class="px-6 py-4 text-right">
-                                        <button class="text-gray-400 hover:text-primary transition">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                </div>
+
+                <!-- RASTREO ACTIVO Y PEDIDOS RECIENTES (Bloque Original) -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+
+                    <!-- Contenedor del Rastreo Activo (2/3 de ancho en desktop) -->
+                    <div
+                        class="lg:col-span-2 rounded-xl border-2 border-slate-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-[#24303F]">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 class="text-xl font-bold text-slate-800 dark:text-white">Rastreo Activo: <span
+                                        class="text-primary" th:text="${ultimoPedido.codigo}">#ENV-XXXXX</span>
+                                </h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">Entrega Estimada: <span
+                                        class="font-semibold" th:text="${ultimoPedido.fechaEstimada}">DD/MM/YYYY</span>
+                                </p>
+                            </div>
+                            <a th:href="@{/pedidos/rastrear/{id}(id=${ultimoPedido.id})}"
+                                class="text-sm font-medium text-primary hover:text-primary-600 transition-colors flex items-center gap-1">
+                                <span class="hidden sm:inline">Ver Detalles</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </a>
+                        </div>
+
+                        <!-- MAP CONTAINER -->
+                        <div id="tracking-map" class="mb-6 border border-gray-200 dark:border-gray-600"></div>
+
+                        <div class="relative pl-8 border-l-2 border-primary/50 dark:border-primary/50 space-y-8">
+                            <div th:each="evento : ${ultimoPedido.timeline}" class="relative">
+                                <!-- El punto de la línea de tiempo. Usamos slate-200 para que se vea bien sobre el fondo blanco/gris oscuro. -->
+                                <div class="absolute -left-[11px] bg-primary h-4 w-4 rounded-full border-2 border-white dark:border-gray-900"
+                                    aria-hidden="true">
+                                </div>
+                                <p class="text-xs text-gray-600 dark:text-gray-300" th:text="${evento.fecha}"></p>
+                                <p class="text-sm font-medium text-slate-800 dark:text-white"
+                                    th:text="${evento.descripcion}"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Acciones Rápidas y Pedidos Recientes (1/3 de ancho en desktop) -->
+                    <div
+                        class="rounded-xl border-2 border-slate-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-[#24303F]">
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-4">Acciones Rápidas</h3>
+                        <div class="space-y-4">
+                            <a th:href="@{/pedidos/nuevo}"
+                                class="flex items-center gap-3 p-4 bg-primary/10 hover:bg-primary/20 hover:text-primary rounded-lg transition-colors group text-primary font-medium">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4" />
+                                </svg>
+                                <span>Solicitar un Nuevo Envío</span>
+                            </a>
+                            <a th:href="@{/pedidos}"
+                                class="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/80 rounded-lg transition-colors group text-gray-600 dark:text-gray-300 font-medium">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                                <span>Ver Historial de Envíos</span>
+                            </a>
+                        </div>
+
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white mt-8 mb-4">Pedidos Recientes</h3>
+                        <div class="space-y-3">
+                            <div th:each="reciente : ${pedidosRecientes}"
+                                class="flex justify-between items-center text-sm">
+                                <span class="font-medium text-slate-800 dark:text-white"
+                                    th:text="${reciente.codigo}">#ENV-XXXXX</span>
+                                <span class="px-2 py-0.5 text-xs rounded-full"
+                                    th:classappend="${reciente.estado == 'Entregado' ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' : 
+                                                    (reciente.estado == 'En Tránsito' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300' : 
+                                                    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300')}"
+                                    th:text="${reciente.estado}">Estado</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
             </main>
         </div>
     </div>
-    <script th:src="@{/js/home.js}"></script>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Custom Dashboard JS -->
+    <script th:src="@{/js/dashboard-cliente.js}"></script>
 </body>
 
 </html>

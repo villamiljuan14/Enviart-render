@@ -1,0 +1,21 @@
+/* Estilos base Dashboard Cliente */
+.text-primary {
+    color: #4F46E5;
+}
+
+.h-screen {
+    height: 100vh;
+}
+
+/* Para asegurar que el gráfico tenga un fondo sólido en ambos modos */
+.apexcharts-canvas {
+    background-color: transparent !important;
+}
+
+/* Map Container */
+#tracking-map {
+    height: 300px;
+    width: 100%;
+    border-radius: 0.5rem;
+    z-index: 1;
+}

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" th:href="@{images/favicon.jpg}" type="image/svg+xml">
+    <title th:text="${ruta.idRuta != null ? 'Editar Ruta' : 'Nueva Ruta'}">Formulario Ruta</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-2xl shadow-xl">
+        <h2 class="text-3xl font-extrabold text-gray-800 mb-6 border-b pb-4"
+            th:text="${ruta.idRuta != null ? 'Editar Ruta' : 'Nueva Ruta'}">
+            Formulario de Ruta
+        </h2>
+
+        <!-- Mensaje de error -->
+        <div th:if="${error}" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            <span th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{${accion}}" method="post" th:object="${ruta}">
+            <!-- ID oculto para edición -->
+            <input type="hidden" th:field="*{idRuta}" />
+
+            <!-- Nombre de Ruta -->
+            <div class="mb-4">
+                <label for="nombreRuta" class="block text-gray-700 font-semibold mb-2">
+                    Nombre de Ruta <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="nombreRuta" th:field="*{nombreRuta}" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Ej: Ruta Norte - Zona 1">
+            </div>
+
+            <!-- Vehículo -->
+            <div class="mb-4">
+                <label for="vehiculoId" class="block text-gray-700 font-semibold mb-2">
+                    Vehículo <span class="text-red-500">*</span>
+                </label>
+                <select id="vehiculoId" name="vehiculo.idVehiculo" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="">-- Seleccione un vehículo --</option>
+                    <option th:each="v : ${vehiculos}" th:value="${v.idVehiculo}"
+                        th:text="${v.placa + ' - ' + v.modelo}"
+                        th:selected="${ruta.vehiculo != null && ruta.vehiculo.idVehiculo == v.idVehiculo}">
+                        ABC-123 - Modelo 2024
+                    </option>
+                </select>
+            </div>
+
+            <!-- Conductor -->
+            <div class="mb-4">
+                <label for="conductorId" class="block text-gray-700 font-semibold mb-2">
+                    Conductor (Mensajero) <span class="text-red-500">*</span>
+                </label>
+                <select id="conductorId" name="conductor.idUsuario" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="">-- Seleccione un conductor --</option>
+                    <option th:each="c : ${conductores}" th:value="${c.idUsuario}"
+                        th:text="${c.primerNombre + ' ' + c.primerApellido + ' (' + c.email + ')'}"
+                        th:selected="${ruta.conductor != null && ruta.conductor.idUsuario == c.idUsuario}">
+                        Juan Pérez (juan@example.com)
+                    </option>
+                </select>
+            </div>
+
+            <!-- Status de Ruta -->
+            <div class="mb-4">
+                <label for="statusRuta" class="block text-gray-700 font-semibold mb-2">
+                    Status de Ruta <span class="text-red-500">*</span>
+                </label>
+                <select id="statusRuta" th:field="*{statusRuta}" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="">-- Seleccione un status --</option>
+                    <option value="PLANIFICADA">Planificada</option>
+                    <option value="EN_CURSO">En Curso</option>
+                    <option value="COMPLETADA">Completada</option>
+                    <option value="CANCELADA">Cancelada</option>
+                </select>
+            </div>
+
+            <!-- Fecha de Inicio -->
+            <div class="mb-6">
+                <label for="fechaInicio" class="block text-gray-700 font-semibold mb-2">
+                    Fecha de Inicio
+                </label>
+                <input type="date" id="fechaInicio" th:field="*{fechaInicio}"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <!-- Botones -->
+            <div class="flex justify-between gap-4">
+                <a th:href="@{/rutas}"
+                    class="bg-gray-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-600 transition">
+                    Cancelar
+                </a>
+                <button type="submit"
+                    class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">
+                    Guardar Ruta
+                </button>
+            </div>
+        </form>
+    </div>
+
+</body>
+
+</html>

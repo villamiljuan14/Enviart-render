@@ -34,6 +34,12 @@ public class TipoServicioService {
 
     @Transactional
     public void eliminarTipoServicio(Integer id) {
+        // Verificar que el tipo de servicio existe antes de eliminarlo
+        tipoServicioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tipo de servicio no encontrado"));
+
+        // Nota: Validar si TipoServicio tiene dependencias depende del modelo de datos
+        // Actualmente no se encontraron referencias FK, pero se debe revisar
         tipoServicioRepository.deleteById(id);
     }
 }

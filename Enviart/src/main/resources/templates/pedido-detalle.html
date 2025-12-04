@@ -4,11 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" th:href="@{images/favicon.jpg}" type="image/svg+xml">
     <title>Detalle del Pedido - Enviart</title>
     <meta name="description" content="Consulta los detalles completos de tu pedido de envío">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <!-- Tracking CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" th:href="@{/css/tracking.css}">
     <style>
         body {
             font-family: 'Outfit', sans-serif;
@@ -89,13 +93,13 @@
                     </p>
                 </div>
                 <div>
-                    <span th:class="${pedido.estado.nombre == 'PENDIENTE' ? 'bg-yellow-100 text-yellow-700' : 
-                                    pedido.estado.nombre == 'EN_PROCESO' ? 'bg-blue-100 text-blue-700' : 
-                                    pedido.estado.nombre == 'EN_TRANSITO' ? 'bg-purple-100 text-purple-700' : 
+                    <span th:class="${pedido.estado.nombre == 'RECEPCIONADO' ? 'bg-yellow-100 text-yellow-700' : 
+                                    pedido.estado.nombre == 'EN_TRANSITO' ? 'bg-blue-100 text-blue-700' : 
+                                    pedido.estado.nombre == 'EN_DISTRIBUCION' ? 'bg-indigo-100 text-indigo-700' : 
                                     pedido.estado.nombre == 'ENTREGADO' ? 'bg-green-100 text-green-700' : 
-                                    'bg-red-100 text-red-700'}"
-                        class="px-6 py-3 rounded-xl text-lg font-bold inline-block">
-                        <span th:text="${pedido.estado.nombre}">PENDIENTE</span>
+                                    pedido.estado.nombre == 'DEVUELTO' ? 'bg-red-100 text-red-700' : 
+                                    'bg-gray-100 text-gray-700'}" class="px-3 py-1 text-sm font-medium rounded-full">
+                        <span th:text="${pedido.estado.nombre}">RECEPCIONADO</span>
                     </span>
                 </div>
             </div>
@@ -176,6 +180,48 @@
                         </svg>
                         <span th:text="${pedido.direccionDestino.telefonoContacto}">3109876543</span>
                     </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tracking en Tiempo Real -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-6" id="trackingSection">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                <div class="bg-blue-100 p-3 rounded-xl">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </div>
+                Seguimiento en Tiempo Real
+            </h2>
+
+            <div class="tracking-card">
+                <div class="tracking-info">
+                    <div class="tracking-info-item">
+                        <label>Estado</label>
+                        <div class="value">
+                            <span id="trackingEstado" class="tracking-status" th:text="${pedido.estado.nombre}">-</span>
+                        </div>
+                    </div>
+                    <div class="tracking-info-item">
+                        <label>Velocidad</label>
+                        <div class="value" id="trackingVelocidad">- km/h</div>
+                    </div>
+                    <div class="tracking-info-item">
+                        <label>Última Actualización</label>
+                        <div class="value" id="trackingUltimaActualizacion">-</div>
+                    </div>
+                </div>
+
+                <div id="trackingMap" class="tracking-map-container"
+                    style="height: 400px; width: 100%; border-radius: 0.5rem;"></div>
+
+                <div id="wsStatus" class="ws-status connecting mt-4">
+                    <span class="ws-status-dot"></span>
+                    <span id="wsStatusText">Conectando servicio de ubicación...</span>
                 </div>
             </div>
         </div>
@@ -268,7 +314,7 @@
                     </div>
                 </div>
 
-                <div class="timeline-item" th:if="${pedido.estado.nombre != 'PENDIENTE'}">
+                <div class="timeline-item" th:if="${pedido.estado.nombre != 'RECEPCIONADO'}">
                     <div class="timeline-dot bg-blue-500">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
@@ -276,12 +322,12 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="font-bold text-slate-800">En Proceso</p>
-                        <p class="text-sm text-slate-500">Preparando el envío</p>
+                        <p class="font-bold text-slate-800">En Tránsito</p>
+                        <p class="text-sm text-slate-500">El pedido está en camino</p>
                     </div>
                 </div>
 
-                <div class="timeline-item opacity-50" th:if="${pedido.estado.nombre == 'PENDIENTE'}">
+                <div class="timeline-item opacity-50" th:if="${pedido.estado.nombre == 'RECEPCIONADO'}">
                     <div class="timeline-dot bg-slate-300">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -289,8 +335,8 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="font-bold text-slate-500">En Proceso</p>
-                        <p class="text-sm text-slate-400">Pendiente</p>
+                        <p class="font-bold text-slate-500">En Tránsito</p>
+                        <p class="text-sm text-slate-400">Pendiente de envío</p>
                     </div>
                 </div>
             </div>
@@ -298,6 +344,23 @@
 
     </div>
 
+    <!-- Tracking Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script th:src="@{/js/tracking-client.js}"></script>
+    <script th:src="@{/js/tracking-map.js}"></script>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const pedidoId = [[${ pedido.idPedido }]];
+            console.log('Iniciando tracking para pedido:', pedidoId);
+            const trackingMap = new TrackingMap('trackingMap', pedidoId);
+
+            // Expose for debugging
+            window.trackingMap = trackingMap;
+        });
+    </script>
 </body>
 
 </html>

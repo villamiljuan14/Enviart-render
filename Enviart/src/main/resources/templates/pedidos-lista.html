@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" th:href="@{images/favicon.jpg}" type="image/svg+xml">
     <title>Mis Pedidos - Enviart</title>
     <meta name="description" content="Consulta y gestiona tus pedidos de envío en Enviart">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -80,7 +81,7 @@
                     <h3 class="text-lg font-bold text-green-800 mb-1">¡Pedido Creado Exitosamente! 🎉</h3>
                     <p class="text-green-700 font-semibold" th:text="${successMessage}"></p>
                 </div>
-                <button onclick="this.parentElement.parentElement.remove()"
+                <button onclick="this.parentElement.parentElement.remove()" aria-label="Cerrar mensaje"
                     class="flex-shrink-0 ml-4 text-green-600 hover:text-green-800 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
@@ -105,7 +106,7 @@
                     <h3 class="text-lg font-bold text-red-800 mb-1">Error al Procesar</h3>
                     <p class="text-red-700 font-semibold" th:text="${errorMessage}"></p>
                 </div>
-                <button onclick="this.parentElement.parentElement.remove()"
+                <button onclick="this.parentElement.parentElement.remove()" aria-label="Cerrar mensaje de error"
                     class="flex-shrink-0 ml-4 text-red-600 hover:text-red-800 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
@@ -135,13 +136,14 @@
                             </p>
                         </div>
                         <div class="flex items-center gap-3">
-                            <span th:class="${pedido.estado.nombre == 'PENDIENTE' ? 'bg-yellow-100 text-yellow-700' : 
-                                            pedido.estado.nombre == 'EN_PROCESO' ? 'bg-blue-100 text-blue-700' : 
-                                            pedido.estado.nombre == 'EN_TRANSITO' ? 'bg-purple-100 text-purple-700' : 
+                            <span th:class="${pedido.estado.nombre == 'RECEPCIONADO' ? 'bg-yellow-100 text-yellow-700' : 
+                                            pedido.estado.nombre == 'EN_TRANSITO' ? 'bg-blue-100 text-blue-700' : 
+                                            pedido.estado.nombre == 'EN_DISTRIBUCION' ? 'bg-indigo-100 text-indigo-700' : 
                                             pedido.estado.nombre == 'ENTREGADO' ? 'bg-green-100 text-green-700' : 
-                                            'bg-red-100 text-red-700'}"
-                                class="px-4 py-2 rounded-full text-sm font-bold">
-                                <span th:text="${pedido.estado.nombre}">PENDIENTE</span>
+                                            pedido.estado.nombre == 'DEVUELTO' ? 'bg-red-100 text-red-700' : 
+                                            'bg-gray-100 text-gray-700'}"
+                                class="px-2 py-1 text-xs font-medium rounded-full">
+                                <span th:text="${pedido.estado.nombre}">RECEPCIONADO</span>
                             </span>
                         </div>
                     </div>
@@ -190,7 +192,7 @@
                                 </svg>
                                 Ver Detalles
                             </a>
-                            <form th:if="${pedido.estado.nombre == 'PENDIENTE'}"
+                            <form th:if="${pedido.estado.nombre == 'RECEPCIONADO'}"
                                 th:action="@{/pedidos/{id}/cancelar(id=${pedido.idPedido})}" method="post"
                                 onsubmit="return confirm('¿Está seguro de cancelar este pedido?');">
                                 <button type="submit"

@@ -26,4 +26,17 @@ public class Vehiculo {
 
     @Column(name = "capacidad_peso", precision = 6, scale = 2)
     private BigDecimal capacidadPeso;
+
+    @Column(name = "tipo_vehiculo", length = 45)
+    private String tipoVehiculo;
+
+    @Column(name = "marca_vehiculo", length = 45)
+    private String marcaVehiculo;
+
+    @Column(name = "año_vehiculo")
+    private Integer anioVehiculo;
+
+    @Column(name = "estado_vehiculo", length = 20)
+    @Enumerated(EnumType.STRING)
+    private Enviart.Enviart.util.enums.EstadoVehiculo estadoVehiculo;
 }

@@ -77,7 +77,7 @@ function initAdminCharts() {
             // Fallback mock data if fetch fails (for development/demo)
             const mockData = {
                 monthlyRevenue: [30000, 40000, 35000, 50000, 49000, 60000, 70000, 91000, 125000, 100000, 140000, 150000],
-                shipmentStatusCounts: { 'Entregado': 65, 'En Tránsito': 25, 'Pendiente': 10 },
+                shipmentStatusCounts: { 'Entregado': 65, 'En Tránsito': 25, 'Recepcionado': 10 },
                 onTimeDeliveryRate: 92,
                 topCities: { 'Bogotá': 400, 'Medellín': 300, 'Cali': 200, 'Barranquilla': 100 },
                 hourlyActivity: Array(24).fill(0).map(() => Math.floor(Math.random() * 100))

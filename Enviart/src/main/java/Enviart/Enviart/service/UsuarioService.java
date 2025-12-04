@@ -1,6 +1,9 @@
 package Enviart.Enviart.service;
 
+import Enviart.Enviart.exception.ReferentialIntegrityException;
 import Enviart.Enviart.model.Usuario;
+import Enviart.Enviart.repository.PedidoRepository;
+import Enviart.Enviart.repository.RutaRepository;
 import Enviart.Enviart.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,11 +18,16 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RutaRepository rutaRepository;
+    private final PedidoRepository pedidoRepository;
 
     @Autowired
-    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder,
+            RutaRepository rutaRepository, PedidoRepository pedidoRepository) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
+        this.rutaRepository = rutaRepository;
+        this.pedidoRepository = pedidoRepository;
     }
 
     @Transactional
@@ -74,8 +82,37 @@ public class UsuarioService {
         return usuarioRepository.findByEmail(email);
     }
 
+    public Optional<Usuario> buscarPorDocumento(String docUsuario) {
+        return usuarioRepository.findByDocUsuario(docUsuario);
+    }
+
     @Transactional
     public void eliminarUsuario(Integer id) {
+        // 1. Verificar que el usuario existe
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // 2. Verificar si es conductor en alguna ruta
+        long rutasComoConductor = rutaRepository.countByConductor_IdUsuario(id);
+
+        if (rutasComoConductor > 0) {
+            throw new ReferentialIntegrityException(
+                    String.format("No se puede eliminar el usuario %s %s porque es conductor en %d ruta(s). " +
+                            "Por favor, reasigne las rutas antes de eliminar el usuario.",
+                            usuario.getPrimerNombre(), usuario.getPrimerApellido(), rutasComoConductor));
+        }
+
+        // 3. Verificar si tiene pedidos asociados
+        long pedidosAsociados = pedidoRepository.countByUsuario_IdUsuario(id);
+
+        if (pedidosAsociados > 0) {
+            throw new ReferentialIntegrityException(
+                    String.format("No se puede eliminar el usuario %s %s porque tiene %d pedido(s) asociados. " +
+                            "No es posible eliminar usuarios con historial de pedidos.",
+                            usuario.getPrimerNombre(), usuario.getPrimerApellido(), pedidosAsociados));
+        }
+
+        // 4. Si no tiene dependencias, proceder con la eliminación
         usuarioRepository.deleteById(id);
     }
 

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" th:href="@{images/favicon.jpg}" type="image/svg+xml">
+    <title th:text="${pago.idPago != null ? 'Editar Pago' : 'Nuevo Pago'}">Formulario Pago</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+    <div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-2xl shadow-xl">
+        <h2 class="text-3xl font-extrabold text-gray-800 mb-6 border-b pb-4"
+            th:text="${pago.idPago != null ? 'Editar Pago' : 'Nuevo Pago'}">Formulario de Pago</h2>
+
+        <div th:if="${error}" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            <span th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{${accion}}" method="post" th:object="${pago}">
+            <input type="hidden" th:field="*{idPago}" />
+
+            <div class="mb-4">
+                <label for="pedidoId" class="block text-gray-700 font-semibold mb-2">
+                    Pedido <span class="text-red-500">*</span>
+                </label>
+                <select id="pedidoId" name="pedido.idPedido" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <option value="">-- Seleccione un pedido --</option>
+                    <option th:each="ped : ${pedidos}" th:value="${ped.idPedido}"
+                        th:text="'Pedido #' + ${ped.idPedido} + ' - $' + ${ped.totalFinal}"
+                        th:selected="${pago.pedido != null && pago.pedido.idPedido == ped.idPedido}">
+                        Pedido #1 - $100.00
+                    </option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label for="tipoPagoId" class="block text-gray-700 font-semibold mb-2">
+                    Tipo de Pago <span class="text-red-500">*</span>
+                </label>
+                <select id="tipoPagoId" name="tipoPago.idTipoPago" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <option value="">-- Seleccione tipo de pago --</option>
+                    <option th:each="tp : ${tiposPago}" th:value="${tp.idTipoPago}" th:text="${tp.nombre}"
+                        th:selected="${pago.tipoPago != null && pago.tipoPago.idTipoPago == tp.idTipoPago}">
+                        Efectivo
+                    </option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label for="monto" class="block text-gray-700 font-semibold mb-2">
+                    Monto <span class="text-red-500">*</span>
+                </label>
+                <input type="number" id="monto" th:field="*{monto}" step="0.01" min="0.01" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="Ej: 150.50">
+            </div>
+
+            <div class="mb-6">
+                <label for="fechaPago" class="block text-gray-700 font-semibold mb-2">
+                    Fecha de Pago <span class="text-red-500">*</span>
+                </label>
+                <input type="datetime-local" id="fechaPago" th:field="*{fechaPago}" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+
+            <div class="flex justify-between gap-4">
+                <a th:href="@{/pagos}"
+                    class="bg-gray-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-600 transition">
+                    Cancelar
+                </a>
+                <button type="submit"
+                    class="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition">
+                    Guardar Pago
+                </button>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

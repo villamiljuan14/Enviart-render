@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" th:href="@{images/favicon.jpg}" type="image/svg+xml">
+    <title>Tracking en Tiempo Real - Enviart</title>
+
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+    <!-- Tracking CSS -->
+    <link rel="stylesheet" th:href="@{/css/tracking.css}">
+</head>
+
+<body class="bg-gray-50">
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <a th:href="@{/home}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                ← Volver al Dashboard
+            </a>
+            <h1 class="text-3xl font-bold text-gray-900 mt-4">
+                Tracking en Tiempo Real
+            </h1>
+            <p class="text-gray-600 mt-2">
+                Seguimiento GPS de pedidos en vivo con WebSocket
+            </p>
+        </div>
+
+        <!-- Estado de conexión WebSocket -->
+        <div id="wsStatus" class="ws-status connecting">
+            <span class="ws-status-dot"></span>
+            <span id="wsStatusText">Conectando...</span>
+        </div>
+
+        <!-- Card de Tracking -->
+        <div class="tracking-card">
+            <h3>📦 Demo de Tracking GPS</h3>
+
+            <!-- Información del pedido ficticio -->
+            <div class="tracking-info">
+                <div class="tracking-info-item">
+                    <label>Número de Guía</label>
+                    <div class="value" id="trackingNumeroGuia">-</div>
+                </div>
+                <div class="tracking-info-item">
+                    <label>Estado</label>
+                    <div class="value">
+                        <span id="trackingEstado" class="tracking-status en-transito">-</span>
+                    </div>
+                </div>
+                <div class="tracking-info-item">
+                    <label>Velocidad Actual</label>
+                    <div class="value" id="trackingVelocidad">- km/h</div>
+                </div>
+                <div class="tracking-info-item">
+                    <label>Última Actualización</label>
+                    <div class="value" id="trackingUltimaActualizacion">-</div>
+                </div>
+            </div>
+
+            <!-- Controles -->
+            <div class="map-controls">
+                <button onclick="startDemo()" class="map-control-btn" id="btnStartDemo">
+                    ▶ Iniciar Demo
+                </button>
+                <button onclick="stopDemo()" class="map-control-btn" id="btnStopDemo" disabled>
+                    ⏸ Detener
+                </button>
+                <button onclick="sendRandomLocation()" class="map-control-btn" id="btnSendLocation" disabled>
+                    📍 Enviar Ubicación Aleatoria
+                </button>
+            </div>
+
+            <!-- Mapa -->
+            <div id="trackingMap" class="tracking-map-container"></div>
+        </div>
+
+        <!-- Instrucciones -->
+        <div class="mt-8 bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+            <h4 class="font-bold text-blue-900 mb-2">📝 Instrucciones de uso:</h4>
+            <ol class="list-decimal list-inside text-blue-800 space-y-1">
+                <li>Asegúrate de tener un pedido creado en la base de datos</li>
+                <li>Ejecuta el script SQL <code class="bg-blue-100 px-2 py-1 rounded">tracking_schema.sql</code></li>
+                <li>Haz clic en "Iniciar Demo" para conectar WebSocket</li>
+                <li>Usa "Enviar Ubicación Aleatoria" para simular movimiento GPS</li>
+                <li>El mapa se actualizará automáticamente en tiempo real</li>
+            </ol>
+        </div>
+
+        <!-- Información de integración -->
+        <div class="mt-8 bg-gray-100 p-6 rounded-lg">
+            <h4 class="font-bold text-gray-900 mb-3">🔌 Endpoints disponibles:</h4>
+            <div class="space-y-2 text-sm font-mono">
+                <div>
+                    <span class="text-green-600 font-bold">GET</span>
+                    <code class="ml-2">/api/tracking/pedido/{id}</code>
+                    - Obtener tracking actual
+                </div>
+                <div>
+                    <span class="text-green-600 font-bold">GET</span>
+                    <code class="ml-2">/api/tracking/pedido/{id}/historial</code>
+                    - Historial de ubicaciones
+                </div>
+                <div>
+                    <span class="text-blue-600 font-bold">WS</span>
+                    <code class="ml-2">/ws-tracking</code>
+                    - WebSocket endpoint
+                </div>
+                <div>
+                    <span class="text-purple-600 font-bold">TOPIC</span>
+                    <code class="ml-2">/topic/pedido/{id}</code>
+                    - Suscribirse a actualizaciones
+                </div>
+            </div>
+        </div>
+
+        <!-- Debug Log -->
+        <div class="mt-8 p-4 bg-black text-green-400 font-mono text-xs rounded h-48 overflow-y-auto" id="debugLog">
+            <div>> Iniciando debug log...</div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <script>
+        // Variables globales
+        let map = null;
+        let stompClient = null;
+        let marker = null;
+        let demoInterval = null;
+        const DEMO_PEDIDO_ID = 1; // Cambiar según tu BD
+
+        // Inicializar mapa Leaflet
+        function initMap() {
+            map = L.map('trackingMap').setView([4.7110, -74.0721], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            console.log('✓ Mapa inicializado');
+            updateStatus('connecting', 'Mapa listo, conectando...');
+        }
+
+        // Conectar WebSocket
+        function connectWebSocket() {
+            const socket = new SockJS('/ws-tracking');
+            stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, function (frame) {
+                console.log('✓ WebSocket conectado');
+                updateStatus('connected', 'Conectado y escuchando');
+
+                // Suscribirse al pedido
+                stompClient.subscribe(`/topic/pedido/${DEMO_PEDIDO_ID}`, function (message) {
+                    const data = JSON.parse(message.body);
+                    console.log('← Actualización recibida:', data);
+                    updateMapMarker(data);
+                });
+
+                // Cargar ubicación inicial
+                loadInitialLocation();
+            }, function (error) {
+                console.error('✗ Error WebSocket:', error);
+                updateStatus('disconnected', 'Desconectado');
+            });
+        }
+
+        // Cargar ubicación inicial
+        async function loadInitialLocation() {
+            try {
+                const response = await fetch(`/api/tracking/pedido/${DEMO_PEDIDO_ID}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    updateMapMarker(data);
+                }
+            } catch (error) {
+                console.warn('No hay ubicación inicial:', error);
+            }
+        }
+
+        // Actualizar marker en mapa
+        function updateMapMarker(data) {
+            const lat = parseFloat(data.latitud);
+            const lon = parseFloat(data.longitud);
+
+            if (isNaN(lat) || isNaN(lon)) return;
+
+            // Actualizar UI
+            document.getElementById('trackingNumeroGuia').textContent = data.numeroGuia || 'ENV-DEMO';
+            document.getElementById('trackingEstado').textContent = data.estado || 'EN_TRANSITO';
+            document.getElementById('trackingVelocidad').textContent = (data.velocidad || 0) + ' km/h';
+            document.getElementById('trackingUltimaActualizacion').textContent =
+                data.ultimaActualizacion ? new Date(data.ultimaActualizacion).toLocaleString('es-CO') : 'Ahora';
+
+            // Actualizar marker
+            if (marker) {
+                marker.setLatLng([lat, lon]);
+            } else {
+                marker = L.marker([lat, lon]).addTo(map);
+            }
+
+            // Centrar mapa
+            map.setView([lat, lon], 15);
+
+            console.log(`✓ Marker actualizado en [${lat}, ${lon}]`);
+        }
+
+        // Enviar ubicación aleatoria (simulación)
+        function sendRandomLocation() {
+            // Bogotá center: 4.7110, -74.0721
+            const baseLat = 4.7110;
+            const baseLon = -74.0721;
+            const randomLat = baseLat + (Math.random() - 0.5) * 0.02;
+            const randomLon = baseLon + (Math.random() - 0.5) * 0.02;
+            const randomSpeed = Math.floor(Math.random() * 60) + 20;
+
+            const locationData = {
+                pedidoId: DEMO_PEDIDO_ID,
+                latitud: randomLat,
+                longitud: randomLon,
+                velocidad: randomSpeed,
+                timestamp: new Date().toISOString()
+            };
+
+            console.log('→ Enviando ubicación:', locationData);
+            stompClient.send('/app/location', {}, JSON.stringify(locationData));
+        }
+
+        // Actualizar estado de conexión
+        function updateStatus(status, text) {
+            const statusEl = document.getElementById('wsStatus');
+            const textEl = document.getElementById('wsStatusText');
+
+            statusEl.className = `ws-status ${status}`;
+            textEl.textContent = text;
+        }
+
+        // Iniciar demo
+        function startDemo() {
+            document.getElementById('btnStartDemo').disabled = true;
+            document.getElementById('btnStopDemo').disabled = false;
+            document.getElementById('btnSendLocation').disabled = false;
+
+            if (!stompClient || !stompClient.connected) {
+                connectWebSocket();
+            }
+
+            // Enviar ubicación cada 5 segundos
+            demoInterval = setInterval(sendRandomLocation, 5000);
+        }
+
+        // Detener demo
+        function stopDemo() {
+            document.getElementById('btnStartDemo').disabled = false;
+            document.getElementById('btnStopDemo').disabled = true;
+            document.getElementById('btnSendLocation').disabled = true;
+
+            if (demoInterval) {
+                clearInterval(demoInterval);
+                demoInterval = null;
+            }
+        }
+
+        // Inicializar al cargar
+        window.addEventListener('DOMContentLoaded', () => {
+            initMap();
+        });
+
+        // Limpiar al salir
+        window.addEventListener('beforeunload', () => {
+            if (stompClient) {
+                stompClient.disconnect();
+            }
+        });
+    </script>
+</body>
+
+</html>

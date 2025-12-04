@@ -1,6 +1,6 @@
 package Enviart.Enviart.util.encryption;
 
-import org.springframework.beans.factory.annotation.Value;
+import Enviart.Enviart.config.AppEncryptionProperties;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
@@ -15,8 +15,11 @@ public class AESEncryptor {
 
     private static final String ALGORITHM = "AES";
 
-    @Value("${app.encryption.key:MySecretKey12345MySecretKey12345}") // 32 caracteres para AES-256
-    private String encryptionKey;
+    private final AppEncryptionProperties encryptionProperties;
+
+    public AESEncryptor(AppEncryptionProperties encryptionProperties) {
+        this.encryptionProperties = encryptionProperties;
+    }
 
     /**
      * Cifra un texto plano
@@ -27,7 +30,7 @@ public class AESEncryptor {
         }
 
         try {
-            SecretKeySpec secretKey = new SecretKeySpec(encryptionKey.getBytes(), ALGORITHM);
+            SecretKeySpec secretKey = new SecretKeySpec(encryptionProperties.getKey().getBytes(), ALGORITHM);
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             byte[] encryptedBytes = cipher.doFinal(plainText.getBytes());
@@ -45,7 +48,7 @@ public class AESEncryptor {
             return encryptedText;
         }
 
-        SecretKeySpec secretKey = new SecretKeySpec(encryptionKey.getBytes(), ALGORITHM);
+        SecretKeySpec secretKey = new SecretKeySpec(encryptionProperties.getKey().getBytes(), ALGORITHM);
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
         byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedText));
