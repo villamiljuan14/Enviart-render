@@ -1,6 +1,9 @@
 package Enviart.Enviart.config;
 
 import Enviart.Enviart.security.CustomUserDetailsService;
+import Enviart.Enviart.security.TwoFactorAuthenticationSuccessHandler;
+import Enviart.Enviart.security.TwoFactorVerificationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,9 +22,12 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
+    private final TwoFactorAuthenticationSuccessHandler twoFactorAuthenticationSuccessHandler;
 
-    public SecurityConfig(CustomUserDetailsService userDetailsService) {
+    public SecurityConfig(CustomUserDetailsService userDetailsService,
+            TwoFactorAuthenticationSuccessHandler twoFactorAuthenticationSuccessHandler) {
         this.userDetailsService = userDetailsService;
+        this.twoFactorAuthenticationSuccessHandler = twoFactorAuthenticationSuccessHandler;
     }
 
     @Bean
@@ -52,14 +58,16 @@ public class SecurityConfig {
                         .requestMatchers("/pedidos/admin/**").hasRole("ADMINISTRADOR")
                         .requestMatchers("/pedidos/**").authenticated()
                         // Otras rutas requieren autenticación
+                        // Otras rutas requieren autenticación
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login") // Página de login personalizada
                         .permitAll()
-                        .defaultSuccessUrl("/home", true) // Redirige a /home después del login
+                        .successHandler(twoFactorAuthenticationSuccessHandler) // Usar handler personalizado para 2FA
                         .failureUrl("/login?error") // Redirige con error si falla
                         .usernameParameter("email") // Usa 'email' en lugar de 'username'
                 )
+                .addFilterAfter(new TwoFactorVerificationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout
                         .logoutUrl("/logout") // URL para hacer logout
                         .logoutSuccessUrl("/") // Redirige al index después del logout

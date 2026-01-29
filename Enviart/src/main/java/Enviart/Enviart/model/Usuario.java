@@ -79,8 +79,14 @@ public class Usuario {
     @Column(name = "estado_usuario", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean estadoUsuario = true;
 
-    @Column(name = "two_factor_secret", length = 255)
-    private String twoFactorSecret;
+    @Column(name = "two_factor_enabled")
+    private Boolean twoFactorEnabled = false;
+
+    @Column(name = "verification_code", length = 6)
+    private String verificationCode;
+
+    @Column(name = "verification_code_expires_at")
+    private LocalDateTime verificationCodeExpiresAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "rol_id_rol", nullable = false)

@@ -457,6 +457,17 @@
                                 </svg>
                                 <span class="text-xs font-medium">Nuevo Usuario</span>
                             </a>
+                            <form th:action="@{/2fa/toggle}" method="post" class="contents">
+                                <button type="submit"
+                                    class="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-700 hover:bg-purple-500/10 hover:text-purple-500 rounded-lg transition-colors group text-gray-600 dark:text-gray-300 w-full h-full">
+                                    <svg class="w-6 h-6 mb-2 text-gray-600 dark:text-gray-400 group-hover:text-purple-500"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                    <span class="text-xs font-medium">Alternar 2FA</span>
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

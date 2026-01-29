@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" th:href="@{images/favicon.jpg}" type="image/svg+xml">
+    <title>Verificación de Dos Pasos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+    <div class="flex min-h-screen items-center justify-center">
+        <div class="flex w-full max-w-4xl rounded-2xl shadow-lg overflow-hidden bg-white">
+
+            <!-- Panel izquierdo -->
+            <div
+                class="hidden md:flex flex-col items-center justify-center w-1/2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white p-10">
+                <div class="mb-6">
+                    <svg class="w-24 h-24 text-white opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                        </path>
+                    </svg>
+                </div>
+                <h2 class="text-3xl font-bold mb-2">Verificación de Seguridad</h2>
+                <p class="mb-6 text-center">Para proteger tu cuenta, requerimos este paso adicional. Revisa tu correo
+                    electrónico.</p>
+            </div>
+
+            <!-- Panel derecho (form) -->
+            <div class="w-full md:w-1/2 p-8 flex flex-col justify-center">
+                <div class="flex justify-center mb-6">
+                    <img th:src="@{/images/Logo.png}" alt="Logo" class="h-12">
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2 text-center">Código de Verificación</h2>
+                <p class="text-gray-500 text-sm mb-8 text-center">Hemos enviado un código de 6 dígitos a tu correo.</p>
+
+                <!-- Mensaje de error -->
+                <div th:if="${error}"
+                    class="mb-6 text-red-600 text-sm bg-red-100 border border-red-300 rounded-lg p-3 text-center flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span th:text="${error}"></span>
+                </div>
+
+                <!-- Mensaje de éxito (reenvío de código) -->
+                <div th:if="${message}"
+                    class="mb-6 text-green-600 text-sm bg-green-100 border border-green-300 rounded-lg p-3 text-center flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span th:text="${message}"></span>
+                </div>
+
+                <form th:action="@{/verify-2fa}" method="post">
+                    <div class="mb-8">
+                        <label for="code" class="block text-gray-700 font-medium mb-2 text-center">Ingresa el
+                            código</label>
+                        <div class="relative">
+                            <input id="code" type="text" name="code" required autofocus maxlength="6"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-0 text-center text-3xl font-bold tracking-[0.5em] text-gray-700 placeholder-gray-300 transition-colors"
+                                placeholder="000000" autocomplete="one-time-code">
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition transform hover:scale-[1.02] shadow-md">
+                        Verificar Acceso
+                    </button>
+
+                    <div class="mt-6 text-center space-y-2">
+                        <p class="text-sm text-gray-600">
+                            ¿No recibiste el código?
+                            <a th:href="@{/2fa/resend}"
+                                class="text-indigo-600 hover:text-indigo-800 font-medium hover:underline">Reenviar
+                                código</a>
+                        </p>
+                        <div class="pt-4 border-t border-gray-100">
+                            <a th:href="@{/logout}"
+                                class="text-xs text-gray-400 hover:text-gray-600 flex items-center justify-center gap-1 transition-colors">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                </svg>
+                                Volver al inicio de sesión
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
